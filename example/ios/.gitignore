@@ -1,0 +1,35 @@
+# Flutter-specific
+/Flutter/App.framework
+/Flutter/Flutter.framework
+/Flutter/Flutter.podspec
+/Flutter/Generated.xcconfig
+/Flutter/app.dill
+/Flutter/app.flx
+/Flutter/app.zip
+/Flutter/flutter_assets/
+/Flutter/flutter_export_environment.sh
+/Flutter/ephemeral/
+
+# CocoaPods
+**/Pods/
+**/.symlinks/
+/Podfile.lock
+
+# Xcode
+**/DerivedData/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.pin
+**/.generated/
+
+# Plug-ins
+/Runner/GeneratedPluginRegistrant.*
+
+# OS generated files
+.DS_Store
+Icon?

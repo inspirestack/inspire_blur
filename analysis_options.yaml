@@ -1,0 +1,10 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - always_declare_return_types
+    - prefer_final_fields
+    - avoid_unused_constructor_parameters
+    - unnecessary_this
+    - prefer_const_constructors
+    - avoid_print

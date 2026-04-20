@@ -1,0 +1,22 @@
+# Gradle
+/.gradle
+**/build
+.cxx/
+
+# Local config
+/local.properties
+
+# Flutter generated
+GeneratedPluginRegistrant.java
+
+# Android Studio captures
+/captures/
+
+# Signing keys
+key.properties
+**/*.keystore
+**/*.jks
+
+# Flutter-specific Android ignores
+flutter_export_environment.sh
+gradle-wrapper.jar

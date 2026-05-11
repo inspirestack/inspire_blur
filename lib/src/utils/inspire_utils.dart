@@ -46,3 +46,30 @@ extension NumExtensions on double {
     return this > 0.0 ? this : 0.0;
   }
 }
+
+List<(double, double)> curveToStops({
+  required double extent,
+  required Curve curve,
+  int stopsCount = 10,
+}) {
+  assert(
+    extent >= 0.0 && extent <= 1.0,
+    'Provide extent in range between 0.0 and 1.0',
+  );
+
+  assert(stopsCount >= 2, 'stopsCount must be >= 2');
+
+  if (extent == 0.0) {
+    return [(0.0, curve.transform(1.0)), (1.0, curve.transform(0.0))];
+  }
+
+  return List.generate(
+    stopsCount,
+    (i) {
+      final t = i / (stopsCount - 1);
+      final stop = t * extent;
+      final value = curve.transform(1 - t).clamp(0.0, 1.0);
+      return (stop, value);
+    },
+  );
+}

@@ -1,5 +1,5 @@
 name: inspire_blur
-description: A modern, high-performance, GPU-friendly progressive blur for Flutter.
+description: A modern, high-performance progressive blur for Flutter — powered by custom GPU shaders.
 version: 0.1.0
 
 homepage: https://inspirestack.app
@@ -7,12 +7,12 @@ repository: https://github.com/inspirestack/inspire_blur
 issue_tracker: https://github.com/inspirestack/inspire_blur/issues
 
 topics:
-  - inspire
   - blur
-  - progressive
   - shader
-  - ui
-  - effects
+  - progressive-blur
+  - ui-effects
+  - impeller
+  - gpu
   - flutter
 
 environment:

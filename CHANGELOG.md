@@ -1,8 +1,8 @@
 ## 0.1.0
 
 * Initial release
-* Two progressive blur widgets (child & backdrop)
 * Centralized `Inspire` API for quick access
-* GPU-optimized shader program for progressive blur based on a blur-strength gradient map
-* Unit and widget tests ensuring reliability
-* Example showcasing all available blur types
+* Progressive blur widgets for child and backdrop mode
+* GPU-optimized shader program based on a blur-strength gradient map
+* Unit and widget tests for improved reliability
+* Example app showcasing all available blur types

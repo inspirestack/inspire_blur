@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:inspire_blur/src/utils/inspire_utils.dart';
 
 /// Defines how blur is applied, including strength and spatial distribution.
 ///
@@ -92,7 +93,7 @@ class InspireBlurConfig {
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeIn] produces a smoother, more gradual fade than the
+  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
   ///   linear curve, especially with larger blur sigma.
   /// - [Curves.easeOut] concentrates most of the blur earlier,
   ///   creating a more abrupt fade near the end.
@@ -104,10 +105,10 @@ class InspireBlurConfig {
     double? sigma,
     double? sigmaX,
     double? sigmaY,
-    Curve fadeCurve = Curves.easeIn,
+    Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = _curveToStops(extent: extent, curve: fadeCurve);
+    final points = curveToStops(extent: extent, curve: fadeCurve);
     return InspireBlurConfig(
       sigma: sigma,
       sigmaX: sigmaX,
@@ -123,7 +124,7 @@ class InspireBlurConfig {
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeIn] produces a smoother, more gradual fade than the
+  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
   ///   linear curve, especially with larger blur sigma.
   /// - [Curves.easeOut] concentrates most of the blur earlier,
   ///   creating a more abrupt fade near the end.
@@ -135,10 +136,10 @@ class InspireBlurConfig {
     double? sigma,
     double? sigmaX,
     double? sigmaY,
-    Curve fadeCurve = Curves.easeIn,
+    Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = _curveToStops(extent: extent, curve: fadeCurve);
+    final points = curveToStops(extent: extent, curve: fadeCurve);
     return InspireBlurConfig(
       sigma: sigma,
       sigmaX: sigmaX,
@@ -154,7 +155,7 @@ class InspireBlurConfig {
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeIn] produces a smoother, more gradual fade than the
+  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
   ///   linear curve, especially with larger blur sigma.
   /// - [Curves.easeOut] concentrates most of the blur earlier,
   ///   creating a more abrupt fade near the end.
@@ -166,10 +167,10 @@ class InspireBlurConfig {
     double? sigma,
     double? sigmaX,
     double? sigmaY,
-    Curve fadeCurve = Curves.easeIn,
+    Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = _curveToStops(extent: extent, curve: fadeCurve);
+    final points = curveToStops(extent: extent, curve: fadeCurve);
     return InspireBlurConfig(
       sigma: sigma,
       sigmaX: sigmaX,
@@ -185,7 +186,7 @@ class InspireBlurConfig {
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeIn] produces a smoother, more gradual fade than the
+  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
   ///   linear curve, especially with larger blur sigma.
   /// - [Curves.easeOut] concentrates most of the blur earlier,
   ///   creating a more abrupt fade near the end.
@@ -197,10 +198,10 @@ class InspireBlurConfig {
     double? sigma,
     double? sigmaX,
     double? sigmaY,
-    Curve fadeCurve = Curves.easeIn,
+    Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = _curveToStops(extent: extent, curve: fadeCurve);
+    final points = curveToStops(extent: extent, curve: fadeCurve);
     return InspireBlurConfig(
       sigma: sigma,
       sigmaX: sigmaX,
@@ -216,7 +217,7 @@ class InspireBlurConfig {
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeIn] produces a smoother, more gradual fade than the
+  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
   ///   linear curve, especially with larger blur sigma.
   /// - [Curves.easeOut] concentrates most of the blur earlier,
   ///   creating a more abrupt fade near the end.
@@ -230,10 +231,10 @@ class InspireBlurConfig {
     double? sigma,
     double? sigmaX,
     double? sigmaY,
-    Curve fadeCurve = Curves.easeIn,
+    Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = _curveToStops(extent: extent, curve: fadeCurve);
+    final points = curveToStops(extent: extent, curve: fadeCurve);
     return InspireBlurConfig(
       sigma: sigma,
       sigmaX: sigmaX,
@@ -259,33 +260,6 @@ class InspireBlurConfig {
       end: Alignment.bottomCenter,
       stops: [0, 1],
       values: [1, 1],
-    );
-  }
-
-  static List<(double, double)> _curveToStops({
-    required double extent,
-    required Curve curve,
-    int stopsCount = 10,
-  }) {
-    assert(
-      extent >= 0.0 && extent <= 1.0,
-      'Provide extent in range between 0.0 and 1.0',
-    );
-
-    assert(stopsCount >= 2, 'stopsCount must be >= 2');
-
-    if (extent == 0.0) {
-      return [(0.0, curve.transform(1.0)), (1.0, curve.transform(0.0))];
-    }
-
-    return List.generate(
-      stopsCount,
-      (i) {
-        final t = i / (stopsCount - 1);
-        final stop = t * extent;
-        final value = curve.transform(1 - t).clamp(0.0, 1.0);
-        return (stop, value);
-      },
     );
   }
 

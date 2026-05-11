@@ -71,4 +71,6 @@ class Inspire {
       child: child,
     );
   }
+
+  static final tint = const InspireTintApi();
 }

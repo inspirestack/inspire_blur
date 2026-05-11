@@ -7,13 +7,11 @@ repository: https://github.com/inspirestack/inspire_blur
 issue_tracker: https://github.com/inspirestack/inspire_blur/issues
 
 topics:
-  - blur
-  - shader
   - progressive-blur
   - ui-effects
   - impeller
+  - shader
   - gpu
-  - flutter
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

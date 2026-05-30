@@ -242,15 +242,13 @@ class _BlurFilterRenderObject extends RenderProxyBox {
       _cachedPaint.imageFilter = ui.ImageFilter.shader(_shader);
     }
 
-    final canvas = context.canvas;
+    final ImageFilterLayer filterLayer = ImageFilterLayer(
+      imageFilter: _cachedPaint.imageFilter,
+    );
 
-    canvas.save();
-    canvas.translate(offset.dx, offset.dy);
-
-    canvas.saveLayer(Offset.zero & size, _cachedPaint);
-    context.paintChild(childValue, Offset.zero);
-
-    canvas.restore();
-    canvas.restore();
+    context.pushLayer(filterLayer,
+        (PaintingContext childContext, Offset childOffset) {
+      childContext.paintChild(childValue, childOffset);
+    }, offset);
   }
 }

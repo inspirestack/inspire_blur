@@ -3,7 +3,7 @@
 **A modern, high-performance progressive blur for Flutter — powered by custom GPU shaders.**
 
 <p align="center">
-  <img src="assets/readme/header.webp" width="800" />
+  <img src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/header.webp" width="800" />
 </p>
 
 Inspire Blur is a simple, flexible, and efficient way to add progressive blur effects in Flutter.
@@ -20,7 +20,7 @@ Inspire Blur is designed to handle many of the common challenges of applying blu
       <td align="center">
         <h4>Backdrop blur — scene effect</h4>
         <img
-          src="assets/readme/backdrop_blur.gif"
+          src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/backdrop_blur.gif"
           alt="Backdrop blur demo"
           width="230"
         />
@@ -32,7 +32,7 @@ Inspire Blur is designed to handle many of the common challenges of applying blu
       <td align="center">
         <h4>Child blur — component effect</h4>
         <img
-          src="assets/readme/child_blur.gif"
+          src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/child_blur.gif"
           alt="Child blur demo"
           width="500"
         />

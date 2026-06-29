@@ -40,6 +40,8 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   int _blurGradientMapGeneration = 0;
   int? _blurGradientMapLastSize;
 
+  bool _disposed = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -73,6 +75,7 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
 
   @override
   void dispose() {
+    _disposed = true;
     _blurGradientMap?.dispose();
     super.dispose();
   }
@@ -99,7 +102,7 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
 
     final newMap = await distributionMap.toImage();
 
-    if (gen != _blurGradientMapGeneration) {
+    if (_disposed || gen != _blurGradientMapGeneration) {
       newMap.dispose();
       return;
     }

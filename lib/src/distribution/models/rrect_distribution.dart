@@ -49,6 +49,9 @@ final class RRectDistribution extends GradientDistribution {
           'cornerRadius must be in the range [0.0, 1.0]',
         );
 
+  /// Returns a copy of this distribution with the provided properties updated.
+  ///
+  /// Any parameter left `null` retains its current value.
   @override
   RRectDistribution copyWith({
     double? horizontalInset,

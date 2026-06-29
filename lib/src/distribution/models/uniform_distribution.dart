@@ -4,6 +4,10 @@ part of 'package:inspire_blur/src/distribution/blur_distribution.dart';
 ///
 /// Every point receives the maximum blur strength.
 class UniformDistribution extends BlurDistribution {
+  /// Creates a uniform blur distribution.
+  const UniformDistribution();
+
+  /// Returns a copy of this distribution.
   @override
-  UniformDistribution copyWith() => UniformDistribution();
+  UniformDistribution copyWith() => const UniformDistribution();
 }

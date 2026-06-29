@@ -27,6 +27,9 @@ final class DirectionalDistribution extends GradientDistribution {
     required this.end,
   }) : assert(begin != end, 'Provide different begin and end');
 
+  /// Returns a copy of this distribution with the provided properties updated.
+  ///
+  /// Any parameter left `null` retains its current value.
   @override
   DirectionalDistribution copyWith({
     Alignment? begin,

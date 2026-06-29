@@ -47,6 +47,9 @@ class EllipseDistribution extends GradientDistribution {
           'radiusY must be greater than or equal to 0.0',
         );
 
+  /// Returns a copy of this distribution with the provided properties updated.
+  ///
+  /// Any parameter left `null` retains its current value.
   @override
   EllipseDistribution copyWith({
     double? radiusX,

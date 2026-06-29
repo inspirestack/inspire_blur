@@ -76,11 +76,15 @@ sealed class GradientDistribution extends BlurDistribution {
     }
   }
 
+  /// Returns `true` if the [values] and [stops] of this and the [other]
+  /// gradient distribution are equal.
   @protected
   bool gradientDistributionEquals(GradientDistribution other) {
     return listEquals(values, other.values) && listEquals(stops, other.stops);
   }
 
+  /// Returns the hash code of this gradient distribution including
+  /// hash codes of [values] and [stops].
   @protected
   int gradientDistributionHashCode() {
     return Object.hash(

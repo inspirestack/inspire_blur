@@ -413,10 +413,13 @@ class InspireBlurConfig {
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      distribution: UniformDistribution(),
+      distribution: const UniformDistribution(),
     );
   }
 
+  /// Returns a copy of this config with the provided properties updated.
+  ///
+  /// Any parameter left `null` retains its current value.
   InspireBlurConfig copyWith({
     double? sigma,
     double? sigmaX,

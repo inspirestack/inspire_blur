@@ -13,26 +13,41 @@ import 'package:inspire_blur/src/inspire_shaders.dart';
 ///
 /// Typically used inside a [Stack], positioned above the content that
 /// should be blurred.
-///
-/// An optional [child] can be provided. The main use for it is to specify
-/// the size of the backdrop. Alternatively, a [child] can be left empty,
-/// and the size can be provided by wrapping this widget in an external
-/// [SizedBox] or [Positioned] with specified [width] and [height].
-///
-/// Behavior and performance:
-///
-/// By default, the blur effect is clipped to the bounds of this widget.
-/// Disabling clipping may cause the blur to extend beyond the widget bounds.
-///
-/// A [RepaintBoundary] is used by default to optimize rendering.
-/// In some cases (e.g. scrolling in nested lists), disabling it may
-/// result in more accurate blur updates, at the expense of performance.
 class InspireBackdropBlur extends StatelessWidget {
+  /// Configuration of the backdrop blur.
+  ///
+  /// Specifies the strength and spatial distribution of the blur effect.
   final InspireBlurConfig config;
+
+  /// Defines how the blur effect is clipped.
+  ///
+  /// Disabling clipping allows the blur to extend beyond widget bounds.
   final Clip clipBehavior;
+
+  /// Whether to isolate the widget into a [RepaintBoundary].
+  ///
+  /// Can improve rendering performance and stability.
+  ///
+  /// In some cases, disabling it may produce more accurate blur updates,
+  /// such as in deeply nested scrollable lists.
   final bool useRepaintBoundary;
+
+  /// Optional child widget.
+  ///
+  /// Typically used to define the size of the backdrop blur area.
+  ///
+  /// Alternatively, the size can be controlled externally using widgets
+  /// such as [SizedBox] or [Positioned].
   final Widget? child;
 
+  /// Creates a backdrop blur.
+  ///
+  /// Blur effect visual properties are specified in the [config].
+  ///
+  /// An optional [child] may be used, mainly for sizing.
+  ///
+  /// For performance and stability adjustments, refer to documentation of the
+  /// [clipBehavior] and [useRepaintBoundary].
   const InspireBackdropBlur({
     super.key,
     required this.config,
@@ -62,8 +77,8 @@ class InspireBackdropBlur extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        final sigmaHorizontal = config.overallSigmaHorizontally();
-        final sigmaVertical = config.overallSigmaVertically();
+        final sigmaHorizontal = config.effectiveSigmaX;
+        final sigmaVertical = config.effectiveSigmaY;
 
         if (sigmaHorizontal != null &&
             sigmaVertical != null &&
@@ -173,7 +188,7 @@ class _InspireBackdropBlurPassState extends State<_InspireBackdropBlurPass> {
 
   void _loadShader() {
     InspireShaders.backdropBlur.then((program) {
-      final shader = program.fragmentShader();
+      final shader = program?.fragmentShader();
       if (mounted) {
         setState(() {
           _shader = shader;

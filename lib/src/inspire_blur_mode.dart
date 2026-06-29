@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_shaders/flutter_shaders.dart';
 
-/// Defines mechanism that Inspire blur uses for rendering.
+/// Defines mechanism which Inspire Blur uses for rendering.
 ///
 /// Different modes offer different trade-offs affecting performance,
 /// visual stability and compatibility in different use cases.
@@ -55,7 +55,7 @@ enum InspireBlurMode {
   ///   (e.g. inside scrollable containers).
   /// - Flutter may translate cached layers instead of repainting them,
   ///   which can lead to subtle inconsistencies in shader-based effects.
-  /// - Coordinate Mismatch: [FlutterFragCoord] may become desynced during
+  /// - Coordinate Mismatch: `FlutterFragCoord` may become desynced during
   ///   Layer Translations (e.g., when a parent translates without repainting).
   /// - Clipping: May exhibit "hard edges" or sampling artifacts near the
   ///   boundaries of a [ClipRect].

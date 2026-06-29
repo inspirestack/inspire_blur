@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -6,20 +5,35 @@ import 'package:flutter/foundation.dart';
 class InspireShaders {
   static const String _pkgName = 'inspire_blur';
 
-  static bool _isTest() {
-    // kDebugMode is always true during tests.
-    if (!kDebugMode) return false;
+  static Future<FragmentProgram?>? _childBlurFuture;
 
-    // Check if the current executable is the flutter_tester (used by testWidgets)
-    // This is safe to call on Android/iOS/Desktop.
-    return Platform.executable.contains('flutter_tester');
+  /// Returns the child blur shader, or `null` if it cannot be loaded.
+  static Future<FragmentProgram?> get childBlur =>
+      _childBlurFuture ??= _loadShader(
+        'shaders/inspire_blur_child.frag',
+      );
+
+  static Future<FragmentProgram?>? _backdropBlurFuture;
+
+  /// Returns the backdrop blur shader, or `null` if it cannot be loaded.
+  static Future<FragmentProgram?> get backdropBlur =>
+      _backdropBlurFuture ??= _loadShader(
+        'shaders/inspire_blur_backdrop.frag',
+      );
+
+  /// Tries to load asset from two different paths during:
+  ///  - normal package use,
+  ///  - running tests inside this package.
+  static Future<FragmentProgram?> _loadShader(String path) async {
+    return await _tryLoad('packages/$_pkgName/$path') ?? await _tryLoad(path);
   }
 
-  static String _resolvePath(String path) {
-    if (_isTest()) {
-      return path; // Local path for tests
+  static Future<FragmentProgram?> _tryLoad(String path) async {
+    try {
+      return await FragmentProgram.fromAsset(path);
+    } catch (_) {
+      return null;
     }
-    return 'packages/$_pkgName/$path'; // Package path for app
   }
 
   @visibleForTesting
@@ -27,16 +41,4 @@ class InspireShaders {
     _childBlurFuture = null;
     _backdropBlurFuture = null;
   }
-
-  static Future<FragmentProgram>? _childBlurFuture;
-  static Future<FragmentProgram> get childBlur =>
-      _childBlurFuture ??= FragmentProgram.fromAsset(
-        _resolvePath('shaders/inspire_blur_child.frag'),
-      );
-
-  static Future<FragmentProgram>? _backdropBlurFuture;
-  static Future<FragmentProgram> get backdropBlur =>
-      _backdropBlurFuture ??= FragmentProgram.fromAsset(
-        _resolvePath('shaders/inspire_blur_backdrop.frag'),
-      );
 }

@@ -1,26 +1,22 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:inspire_blur/src/utils/inspire_utils.dart';
+import 'package:inspire_blur/src/distribution/blur_distribution.dart';
+import 'package:inspire_blur/src/utils/inspire_stops_generator.dart';
 
-/// Defines how blur is applied, including strength and spatial distribution.
+/// Defines how blur is applied, including strength and spatial [distribution].
 ///
-/// A blur can be:
-/// - uniform (using [sigma])
-/// - directional (using [sigmaX] and/or [sigmaY])
+/// Blur strength can be:
+/// - **Uniform:** using [sigma]
+/// - **Independent per-axis:** using [sigmaX] and/or [sigmaY]
 ///
-/// The blur intensity across the widget is controlled by a gradient defined
-/// by [start], [end], [stops], and [values].
-///
-/// Use the provided factory constructors for common patterns.
+/// For common patterns, use the factory constructors, such as
+/// [InspireBlurConfig.topToBottom] or [InspireBlurConfig.directional].
 class InspireBlurConfig {
-  /// Blur strength applied in both directions.
+  /// Blur strength applied uniformly in both directions.
   ///
   /// This produces a standard two-dimensional Gaussian blur.
   ///
-  /// To control blur per axis, use [sigmaX] and/or [sigmaY] instead.
-  ///
-  /// Providing only one of [sigmaX] or [sigmaY] results in a
-  /// one-directional blur.
+  /// To control horizontal and vertical blur strength separately,
+  /// use [sigmaX] and/or [sigmaY].
   final double? sigma;
 
   /// Blur strength applied horizontally.
@@ -33,55 +29,27 @@ class InspireBlurConfig {
   /// Can be used independently or together with [sigmaX].
   final double? sigmaY;
 
-  /// Start of the blur gradient.
-  ///
-  /// Defines where the gradient begins.
-  final Alignment start;
+  /// Returns the effective horizontal blur strength.
+  double? get effectiveSigmaX => sigma ?? sigmaX;
 
-  /// End of the blur gradient.
-  ///
-  /// Defines where the gradient ends.
-  final Alignment end;
+  /// Returns the effective vertical blur strength.
+  double? get effectiveSigmaY => sigma ?? sigmaY;
 
-  /// Positions of blur gradient stops, in the range [0.0, 1.0].
-  ///
-  /// Must be sorted in ascending order and match the length of [values].
-  final List<double> stops;
-
-  /// Blur intensity at each stop, in the range [0.0, 1.0].
-  /// - 0.0 → no blur
-  /// - 1.0 → full blur (based on sigma)
-  ///
-  /// Example:
-  /// - stops:    [0.0, 1.0]
-  ///   values:   [1.0, 0.0] → blur fades out from start to end
-  ///
-  /// - stops:    [0.0, 0.5, 1.0]
-  ///   values:   [0.0, 1.0, 0.0] → blur peaks in the middle
-  final List<double> values;
-
-  /// Returns effective horizontal blur strength.
-  double? overallSigmaHorizontally() => sigma ?? sigmaX;
-
-  /// Returns effective vertical blur strength.
-  double? overallSigmaVertically() => sigma ?? sigmaY;
+  /// Spatial distribution of the blur effect.
+  final BlurDistribution distribution;
 
   /// Creates a blur configuration.
   ///
-  /// Exactly one of the following must be provided:
+  /// To define blur strength, provide one of the following combinations:
   /// - [sigma]
-  /// - at least one of [sigmaX] or [sigmaY]
+  /// - at least one of [sigmaX], [sigmaY]
   ///
-  /// [sigmaX] and [sigmaY] can be different to generate different blur
-  /// strength horizontally and vertically.
+  /// [sigmaX] and [sigmaY] can have different values to generate different
+  /// blur strengths on the horizontal and vertical axes.
   ///
-  /// The blur intensity is distributed according to the gradient
-  /// defined by [start], [end], [stops], and [values].
+  /// Providing [sigma] together with [sigmaX] or [sigmaY] will throw an error.
   InspireBlurConfig({
-    required this.start,
-    required this.end,
-    required this.stops,
-    required this.values,
+    required this.distribution,
     this.sigma,
     this.sigmaX,
     this.sigmaY,
@@ -89,18 +57,20 @@ class InspireBlurConfig {
     assertValid();
   }
 
-  /// Progressive blur from top (full strength) to bottom (zero strength).
+  /// Progressive blur fading from top to bottom.
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
-  ///   linear curve, especially with larger blur sigma.
-  /// - [Curves.easeOut] concentrates most of the blur earlier,
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
   ///   creating a more abrupt fade near the end.
   ///
-  ///
   /// [extent] defines how far the blur gradient extends from the
-  /// starting point (0.0–1.0).
+  /// starting point.
+  ///
+  /// Typical values are in the range `[0.0, 1.0]`, although larger values
+  /// are also supported.
   factory InspireBlurConfig.topToBottom({
     double? sigma,
     double? sigmaX,
@@ -108,30 +78,31 @@ class InspireBlurConfig {
     Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = curveToStops(extent: extent, curve: fadeCurve);
-    return InspireBlurConfig(
+    return InspireBlurConfig.directional(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: points.map((e) => e.$1).toList(),
-      values: points.map((e) => e.$2).toList(),
+      fadeCurve: fadeCurve,
+      extent: extent,
     );
   }
 
-  /// Progressive blur from bottom (full strength) to top (zero strength).
+  /// Progressive blur fading from bottom to top.
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
-  ///   linear curve, especially with larger blur sigma.
-  /// - [Curves.easeOut] concentrates most of the blur earlier,
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
   ///   creating a more abrupt fade near the end.
   ///
-  ///
   /// [extent] defines how far the blur gradient extends from the
-  /// starting point (0.0–1.0).
+  /// starting point.
+  ///
+  /// Typical values are in the range `[0.0, 1.0]`, although larger values
+  /// are also supported.
   factory InspireBlurConfig.bottomToTop({
     double? sigma,
     double? sigmaX,
@@ -139,30 +110,31 @@ class InspireBlurConfig {
     Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = curveToStops(extent: extent, curve: fadeCurve);
-    return InspireBlurConfig(
+    return InspireBlurConfig.directional(
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      start: Alignment.bottomCenter,
-      end: Alignment.topCenter,
-      stops: points.map((e) => e.$1).toList(),
-      values: points.map((e) => e.$2).toList(),
+      fadeCurve: fadeCurve,
+      extent: extent,
     );
   }
 
-  /// Progressive blur from left (full strength) to right (zero strength).
+  /// Progressive blur fading from left to right.
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
-  ///   linear curve, especially with larger blur sigma.
-  /// - [Curves.easeOut] concentrates most of the blur earlier,
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
   ///   creating a more abrupt fade near the end.
   ///
-  ///
   /// [extent] defines how far the blur gradient extends from the
-  /// starting point (0.0–1.0).
+  /// starting point.
+  ///
+  /// Typical values are in the range `[0.0, 1.0]`, although larger values
+  /// are also supported.
   factory InspireBlurConfig.leftToRight({
     double? sigma,
     double? sigmaX,
@@ -170,30 +142,31 @@ class InspireBlurConfig {
     Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = curveToStops(extent: extent, curve: fadeCurve);
-    return InspireBlurConfig(
+    return InspireBlurConfig.directional(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      start: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      stops: points.map((e) => e.$1).toList(),
-      values: points.map((e) => e.$2).toList(),
+      fadeCurve: fadeCurve,
+      extent: extent,
     );
   }
 
-  /// Progressive blur from right (full strength) to left (zero strength).
+  /// Progressive blur fading from right to left.
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
-  ///   linear curve, especially with larger blur sigma.
-  /// - [Curves.easeOut] concentrates most of the blur earlier,
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
   ///   creating a more abrupt fade near the end.
   ///
-  ///
   /// [extent] defines how far the blur gradient extends from the
-  /// starting point (0.0–1.0).
+  /// starting point.
+  ///
+  /// Typical values are in the range `[0.0, 1.0]`, although larger values
+  /// are also supported.
   factory InspireBlurConfig.rightToLeft({
     double? sigma,
     double? sigmaX,
@@ -201,32 +174,33 @@ class InspireBlurConfig {
     Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = curveToStops(extent: extent, curve: fadeCurve);
-    return InspireBlurConfig(
+    return InspireBlurConfig.directional(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      start: Alignment.centerRight,
-      end: Alignment.centerLeft,
-      stops: points.map((e) => e.$1).toList(),
-      values: points.map((e) => e.$2).toList(),
+      fadeCurve: fadeCurve,
+      extent: extent,
     );
   }
 
-  /// Progressive blur from [start] to [end].
+  /// Progressive blur from [begin] to [end].
   ///
   /// [fadeCurve] defines how blur intensity transitions across the gradient.
   /// For example:
-  /// - [Curves.easeInSine] produces a smoother, more gradual fade than the
-  ///   linear curve, especially with larger blur sigma.
-  /// - [Curves.easeOut] concentrates most of the blur earlier,
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
   ///   creating a more abrupt fade near the end.
   ///
-  ///
   /// [extent] defines how far the blur gradient extends from the
-  /// starting point (0.0–1.0).
+  /// starting point.
+  ///
+  /// Typical values are in the range `[0.0, 1.0]`, although larger values
+  /// are also supported.
   factory InspireBlurConfig.directional({
-    required Alignment start,
+    required Alignment begin,
     required Alignment end,
     double? sigma,
     double? sigmaX,
@@ -234,20 +208,203 @@ class InspireBlurConfig {
     Curve fadeCurve = Curves.easeInSine,
     double extent = 1.0,
   }) {
-    final points = curveToStops(extent: extent, curve: fadeCurve);
+    assert(
+      extent >= 0.0,
+      'extent must be greater than or equal to 0.0',
+    );
+
+    final points = curveToValuesAndStops(endStop: extent, curve: fadeCurve);
+
     return InspireBlurConfig(
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      start: start,
-      end: end,
-      stops: points.map((e) => e.$1).toList(),
-      values: points.map((e) => e.$2).toList(),
+      distribution: DirectionalDistribution(
+        begin: begin,
+        end: end,
+        values: points.map((e) => e.$1).toList(),
+        stops: points.map((e) => e.$2).toList(),
+      ),
     );
   }
 
-  /// Blur that has a constant strength across the whole widget area.
-  factory InspireBlurConfig.uniform({
+  /// Blur with an elliptical fade.
+  ///
+  /// [radiusX] and [radiusY] define the size of the elliptical blur region
+  /// as a fraction of the area.
+  /// Typical values are in the range `[0.0, 1.0]`, although values greater
+  /// than 1.0 are also supported. This causes the ellipse to extend beyond
+  /// the widget bounds, which can be useful for creating large vignette or
+  /// spotlight effects.
+  ///
+  /// [feather] is the width of the blur transition. A value of 0.0 creates
+  /// a hard edge, while larger values create a softer and more gradual
+  /// transition.
+  ///
+  /// [center] specifies the center point of the elliptical blur region.
+  /// The default is [Alignment.center].
+  ///
+  /// Set [inverse] to `true` to invert the blur distribution, creating
+  /// a vignette-like effect where the blur is strongest outside the ellipse
+  /// and gradually fades toward its center.
+  ///
+  /// [fadeCurve] defines how blur intensity transitions across the gradient.
+  /// For example:
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
+  ///   creating a more abrupt fade near the end.
+  factory InspireBlurConfig.ellipse({
+    required double radiusX,
+    required double radiusY,
+    double? sigma,
+    double? sigmaX,
+    double? sigmaY,
+    double feather = 1.0,
+    bool inverse = false,
+    Alignment center = Alignment.center,
+    Curve fadeCurve = Curves.easeOutSine,
+  }) {
+    assert(
+      feather >= 0.0 && feather <= 1.0,
+      'feather must be in the range [0.0, 1.0]',
+    );
+
+    final points = curveToValuesAndStops(
+      startStop: 1.0 - feather,
+      endStop: 1.0,
+      curve: fadeCurve,
+    );
+
+    return InspireBlurConfig(
+      sigma: sigma,
+      sigmaX: sigmaX,
+      sigmaY: sigmaY,
+      distribution: EllipseDistribution(
+        radiusX: radiusX,
+        radiusY: radiusY,
+        center: center,
+        inverse: inverse,
+        values: points.map((e) => e.$1).toList(),
+        stops: points.map((e) => e.$2).toList(),
+      ),
+    );
+  }
+
+  /// Blur with a rectangular fade.
+  ///
+  /// [horizontalInset] is the distance from the left and right edges of
+  /// the widget to the rectangular blur region.
+  ///
+  /// [verticalInset] is the distance from the top and bottom edges of
+  /// the widget to the rectangular blur region.
+  ///
+  /// [feather] is the width of the blur transition. A value of 0.0 creates
+  /// a hard edge, while larger values create a softer and more gradual
+  /// transition.
+  ///
+  /// [horizontalInset], [verticalInset], and [feather] are normalized
+  /// to the range `[0.0, 1.0]`.
+  ///
+  /// Set [inverse] to `true` to invert the blur distribution, creating
+  /// a vignette-like effect where the blur is strongest outside the rectangle
+  /// and gradually fades toward its center.
+  ///
+  /// [fadeCurve] defines how blur intensity transitions across the gradient.
+  /// For example:
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
+  ///   creating a more abrupt fade near the end.
+  factory InspireBlurConfig.rectangle({
+    required double horizontalInset,
+    required double verticalInset,
+    required double feather,
+    double? sigma,
+    double? sigmaX,
+    double? sigmaY,
+    bool inverse = false,
+    Curve fadeCurve = Curves.easeOutSine,
+  }) {
+    return InspireBlurConfig.roundedRectangle(
+      horizontalInset: horizontalInset,
+      verticalInset: verticalInset,
+      cornerRadius: 0.0,
+      feather: feather,
+      sigma: sigma,
+      sigmaX: sigmaX,
+      sigmaY: sigmaY,
+      inverse: inverse,
+      fadeCurve: fadeCurve,
+    );
+  }
+
+  /// Blur with a rounded rectangular fade.
+  ///
+  /// [horizontalInset] is the distance from the left and right edges of
+  /// the widget to the rectangular blur region.
+  ///
+  /// [verticalInset] is the distance from the top and bottom edges of
+  /// the widget to the rectangular blur region.
+  ///
+  /// [cornerRadius] is the radius of the rectangle corners.
+  ///
+  /// [feather] is the width of the blur transition. A value of 0.0 creates
+  /// a hard edge, while larger values create a softer and more gradual
+  /// transition.
+  ///
+  /// [horizontalInset], [verticalInset], [cornerRadius], and [feather]
+  /// are normalized to the range `[0.0, 1.0]`.
+  ///
+  /// Set [inverse] to `true` to invert the blur distribution, creating
+  /// a vignette-like effect where the blur is strongest outside the rectangle
+  /// and gradually fades toward its center.
+  ///
+  /// [fadeCurve] defines how blur intensity transitions across the gradient.
+  /// For example:
+  /// * [Curves.easeInSine] produces a smoother, more gradual fade than
+  ///   [Curves.linear], especially for large blur sigma values.
+  /// * [Curves.easeOut] concentrates most of the blur near the beginning,
+  ///   creating a more abrupt fade near the end.
+  factory InspireBlurConfig.roundedRectangle({
+    required double horizontalInset,
+    required double verticalInset,
+    required double cornerRadius,
+    required double feather,
+    double? sigma,
+    double? sigmaX,
+    double? sigmaY,
+    bool inverse = false,
+    Curve fadeCurve = Curves.easeOutSine,
+  }) {
+    assert(
+      feather >= 0.0 && feather <= 1.0,
+      'feather must be in the range [0.0, 1.0]',
+    );
+
+    final points = curveToValuesAndStops(
+      startStop: 1.0 - feather,
+      endStop: 1.0,
+      curve: fadeCurve,
+    );
+
+    return InspireBlurConfig(
+      sigma: sigma,
+      sigmaX: sigmaX,
+      sigmaY: sigmaY,
+      distribution: RRectDistribution(
+        horizontalInset: horizontalInset,
+        verticalInset: verticalInset,
+        cornerRadius: cornerRadius,
+        inverse: inverse,
+        values: points.map((e) => e.$1).toList(),
+        stops: points.map((e) => e.$2).toList(),
+      ),
+    );
+  }
+
+  /// Blur with a constant strength across the whole widget area.
+  factory InspireBlurConfig.solid({
     double? sigma,
     double? sigmaX,
     double? sigmaY,
@@ -256,10 +413,7 @@ class InspireBlurConfig {
       sigma: sigma,
       sigmaX: sigmaX,
       sigmaY: sigmaY,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [0, 1],
-      values: [1, 1],
+      distribution: UniformDistribution(),
     );
   }
 
@@ -267,27 +421,18 @@ class InspireBlurConfig {
     double? sigma,
     double? sigmaX,
     double? sigmaY,
-    Alignment? start,
-    Alignment? end,
-    List<double>? stops,
-    List<double>? values,
+    BlurDistribution? distribution,
   }) {
     final newSigma = sigma ?? this.sigma;
     final newSigmaX = sigmaX ?? this.sigmaX;
     final newSigmaY = sigmaY ?? this.sigmaY;
-    final newStart = start ?? this.start;
-    final newEnd = end ?? this.end;
-    final newStops = stops?.toList() ?? this.stops.toList();
-    final newValues = values?.toList() ?? this.values.toList();
+    final newDistribution = distribution ?? this.distribution;
 
     return InspireBlurConfig(
       sigma: newSigma,
       sigmaX: newSigmaX,
       sigmaY: newSigmaY,
-      start: newStart,
-      end: newEnd,
-      stops: newStops,
-      values: newValues,
+      distribution: newDistribution,
     );
   }
 
@@ -297,10 +442,7 @@ class InspireBlurConfig {
       sigmaX: sigma,
       sigmaY: null,
       sigma: null,
-      start: start,
-      end: end,
-      stops: stops.toList(),
-      values: values.toList(),
+      distribution: distribution,
     );
   }
 
@@ -310,10 +452,7 @@ class InspireBlurConfig {
       sigmaX: null,
       sigmaY: sigma,
       sigma: null,
-      start: start,
-      end: end,
-      stops: stops.toList(),
-      values: values.toList(),
+      distribution: distribution,
     );
   }
 
@@ -325,10 +464,7 @@ class InspireBlurConfig {
         other.sigma == sigma &&
         other.sigmaX == sigmaX &&
         other.sigmaY == sigmaY &&
-        other.start == start &&
-        other.end == end &&
-        listEquals(other.stops, stops) &&
-        listEquals(other.values, values);
+        other.distribution == distribution;
   }
 
   @override
@@ -336,14 +472,11 @@ class InspireBlurConfig {
         sigma,
         sigmaX,
         sigmaY,
-        start,
-        end,
-        Object.hashAll(stops),
-        Object.hashAll(values),
+        distribution,
       );
 }
 
-extension ConfigAssertExtension on InspireBlurConfig {
+extension InspireBlurConfigAssertions on InspireBlurConfig {
   void assertValid() {
     final s = sigma;
     final sx = sigmaX;
@@ -364,47 +497,6 @@ extension ConfigAssertExtension on InspireBlurConfig {
 
     if (sy != null) {
       assert(sy >= 0.0, 'Provide non-negative sigmaY');
-    }
-
-    assert(
-      start != end,
-      'Provide different start and end',
-    );
-
-    assert(
-      stops.length >= 2,
-      'Provide at least two blur stops',
-    );
-
-    assert(
-      values.length >= 2,
-      'Provide at least two blur values',
-    );
-
-    assert(
-      stops.length == values.length,
-      'Provide same number of stops and values',
-    );
-
-    for (int i = 1; i < stops.length; i++) {
-      assert(
-        stops[i] > stops[i - 1],
-        'Provide stops in increasing order',
-      );
-    }
-
-    for (final stop in stops) {
-      assert(
-        stop >= 0.0 && stop <= 1.0,
-        'Provide all stops in range between 0.0 and 1.0',
-      );
-    }
-
-    for (final value in values) {
-      assert(
-        value >= 0.0 && value <= 1.0,
-        'Provide all values in range between 0.0 and 1.0',
-      );
     }
   }
 }

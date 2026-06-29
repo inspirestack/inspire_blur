@@ -1,48 +1,61 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:inspire_blur/inspire_blur.dart';
+import 'package:inspire_blur/src/distribution/blur_distribution.dart';
+import 'package:inspire_blur/src/inspire_blur_config.dart';
+
+import 'test_core.dart';
 
 void main() {
   InspireBlurConfig mockValidConfig() => InspireBlurConfig(
         sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       );
 
   test('Constructor accepts valid configs', () {
     final configWithSigma = InspireBlurConfig(
       sigma: 1,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [0, 1],
-      values: [0, 1],
+      distribution: DirectionalDistribution(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0, 1],
+        values: [0, 1],
+      ),
     );
 
     final configWithSigmaX = InspireBlurConfig(
       sigmaX: 2,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [0, 1],
-      values: [0, 1],
+      distribution: DirectionalDistribution(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0, 1],
+        values: [0, 1],
+      ),
     );
 
     final configWithSigmaY = InspireBlurConfig(
       sigmaY: 3,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [0, 1],
-      values: [0, 1],
+      distribution: DirectionalDistribution(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0, 1],
+        values: [0, 1],
+      ),
     );
 
     final configWithSigmaXY = InspireBlurConfig(
       sigmaX: 5,
       sigmaY: 8,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [0, 1],
-      values: [0, 1],
+      distribution: DirectionalDistribution(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0, 1],
+        values: [0, 1],
+      ),
     );
 
     expect(configWithSigma.sigma, equals(1));
@@ -69,10 +82,12 @@ void main() {
   test('Constructor throws when no sigma provided', () {
     expect(
       () => InspireBlurConfig(
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ),
       throwsAssertionError,
     );
@@ -84,10 +99,12 @@ void main() {
         sigma: 5,
         sigmaX: 5,
         sigmaY: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ),
       throwsAssertionError,
     );
@@ -97,10 +114,12 @@ void main() {
     expect(
       () => InspireBlurConfig(
         sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(
         sigmaX: 5,
         sigmaY: 5,
@@ -114,10 +133,12 @@ void main() {
       () => InspireBlurConfig(
         sigma: 5,
         sigmaX: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ),
       throwsAssertionError,
     );
@@ -127,10 +148,12 @@ void main() {
     expect(
       () => InspireBlurConfig(
         sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(sigmaX: 5),
       throwsAssertionError,
     );
@@ -141,10 +164,12 @@ void main() {
       () => InspireBlurConfig(
         sigma: 5,
         sigmaY: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ),
       throwsAssertionError,
     );
@@ -154,10 +179,12 @@ void main() {
     expect(
       () => InspireBlurConfig(
         sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(sigmaY: 5),
       throwsAssertionError,
     );
@@ -205,394 +232,32 @@ void main() {
     );
   });
 
-  test('Constructor throws when start equals end', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.center,
-        end: Alignment.center,
-        stops: [0, 1],
-        values: [0, 1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when start equals end', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.center,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(start: Alignment.center),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when stops and values length differ', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 0.5, 1],
-      ),
-      throwsAssertionError,
-    );
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 0.5, 1],
-        values: [0, 1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when stops and values length differ', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(values: [0, 0.5, 1]),
-      throwsAssertionError,
-    );
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(stops: [0, 0.5, 1]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when not at least 2 blur stops provided', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [],
-        values: [0, 1],
-      ),
-      throwsAssertionError,
-    );
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0],
-        values: [0, 1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when not at least 2 blur stops provided', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(stops: []),
-      throwsAssertionError,
-    );
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(stops: [0]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when not at least 2 blur values provided', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [],
-      ),
-      throwsAssertionError,
-    );
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when not at least 2 blur values provided', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(values: []),
-      throwsAssertionError,
-    );
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(values: [0]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when stops are not in increasing order', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1, 0.9],
-        values: [0, 0.5, 1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when stops are not in increasing order', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 0.5, 1],
-        values: [0, 0.5, 1],
-      ).copyWith(stops: [0, 1, 0.9]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when stops are outside [0,1] range', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [-0.1, 1],
-        values: [0, 1],
-      ),
-      throwsAssertionError,
-    );
-
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1.1],
-        values: [0, 1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when stops are outside [0,1] range', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(stops: [-0.1, 1]),
-      throwsAssertionError,
-    );
-
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(stops: [0, 1.1]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when stops contain duplicates', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 0.5, 0.5, 1],
-        values: [0, 0.25, 0.75, 1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when stops contain duplicates', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 0.25, 0.75, 1],
-        values: [0, 0.25, 0.75, 1],
-      ).copyWith(stops: [0, 0.5, 0.5, 1]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Constructor throws when values are outside [0,1] range', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [-0.1, 1],
-      ),
-      throwsAssertionError,
-    );
-
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1.1],
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when values are outside [0,1] range', () {
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(values: [-0.1, 1]),
-      throwsAssertionError,
-    );
-
-    expect(
-      () => InspireBlurConfig(
-        sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
-      ).copyWith(values: [0, 1.1]),
-      throwsAssertionError,
-    );
-  });
-
-  test('Lists are not shared by reference — copyWith', () {
-    final config = mockValidConfig();
-    final updated = config.copyWith();
-
-    expect(identical(config.stops, updated.stops), false);
-    expect(identical(config.values, updated.values), false);
-  });
-
-  test('Lists are not shared by reference — onlyHorizontal', () {
-    final config = mockValidConfig();
-    final updated = config.onlyHorizontal(5);
-
-    expect(identical(config.stops, updated.stops), false);
-    expect(identical(config.values, updated.values), false);
-  });
-
-  test('Lists are not shared by reference — onlyVertical', () {
-    final config = mockValidConfig();
-    final updated = config.onlyVertical(5);
-
-    expect(identical(config.stops, updated.stops), false);
-    expect(identical(config.values, updated.values), false);
-  });
-
-  test('Different list instances but same values are equal', () {
-    final a = mockValidConfig();
-    final b = mockValidConfig().copyWith(
-      stops: [...a.stops],
-      values: [...a.values],
-    );
-
-    expect(a, equals(b));
-  });
-
   test('Horizontal and vertical sigma is derived correctly from one', () {
     final config = InspireBlurConfig.topToBottom(sigma: 5);
 
-    expect(config.overallSigmaHorizontally(), 5);
-    expect(config.overallSigmaVertically(), 5);
+    expect(config.effectiveSigmaX, 5);
+    expect(config.effectiveSigmaY, 5);
   });
 
   test('Horizontal and vertical sigma is derived correctly from separate', () {
     final config = InspireBlurConfig.topToBottom(sigmaX: 5, sigmaY: 13);
 
-    expect(config.overallSigmaHorizontally(), 5);
-    expect(config.overallSigmaVertically(), 13);
+    expect(config.effectiveSigmaX, 5);
+    expect(config.effectiveSigmaY, 13);
   });
 
   test('One-directional horizontal sigma is applied correctly', () {
     final config = InspireBlurConfig.topToBottom(sigmaX: 8);
 
-    expect(config.overallSigmaHorizontally(), 8);
-    expect(config.overallSigmaVertically(), null);
+    expect(config.effectiveSigmaX, 8);
+    expect(config.effectiveSigmaY, null);
   });
 
   test('One-directional vertical sigma is applied correctly', () {
     final config = InspireBlurConfig.topToBottom(sigmaY: 8);
 
-    expect(config.overallSigmaHorizontally(), null);
-    expect(config.overallSigmaVertically(), 8);
-  });
-
-  test('All values are replaced by copyWith', () {
-    final config = mockValidConfig().copyWith(
-      sigma: 21,
-      start: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      stops: [0, 0.2, 1],
-      values: [0, 0.3, 1],
-    );
-
-    expect(config.sigma, equals(21));
-    expect(config.start, equals(Alignment.topLeft));
-    expect(config.end, equals(Alignment.bottomRight));
-    expect(config.stops, equals([0, 0.2, 1]));
-    expect(config.values, equals([0, 0.3, 1]));
+    expect(config.effectiveSigmaX, null);
+    expect(config.effectiveSigmaY, 8);
   });
 
   test('Only sigma is replaced by copyWith', () {
@@ -602,153 +267,72 @@ void main() {
     expect(newConfig.sigma, equals(34));
     expect(newConfig.sigmaX, equals(originalConfig.sigmaX));
     expect(newConfig.sigmaY, equals(originalConfig.sigmaY));
-    expect(newConfig.start, equals(originalConfig.start));
-    expect(newConfig.end, equals(originalConfig.end));
-    expect(newConfig.stops, equals(originalConfig.stops));
-    expect(newConfig.values, equals(originalConfig.values));
+    expect(newConfig.distribution, equals(originalConfig.distribution));
   });
 
   test('No values are replaced by copyWith when nulls are passed', () {
     final config = InspireBlurConfig(
       sigma: 21,
-      start: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      stops: [0, 0.2, 1],
-      values: [0, 0.3, 1],
+      distribution: DirectionalDistribution(
+        values: [0, 1],
+        stops: [0, 1],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
     );
     final copiedConfig = config.copyWith();
 
     expect(copiedConfig.sigma, equals(21));
-    expect(copiedConfig.start, equals(Alignment.topLeft));
-    expect(copiedConfig.end, equals(Alignment.bottomRight));
-    expect(copiedConfig.stops, equals([0, 0.2, 1]));
-    expect(copiedConfig.values, equals([0, 0.3, 1]));
-  });
-
-  test('copyWith updates start', () {
-    final config = mockValidConfig();
-
-    final updated = config.copyWith(start: Alignment.center);
-
-    expect(updated.start, Alignment.center);
-    expect(updated.end, config.end);
-  });
-
-  test('copyWith updates end', () {
-    final config = mockValidConfig();
-
-    final updated = config.copyWith(end: Alignment.center);
-
-    expect(updated.start, config.start);
-    expect(updated.end, Alignment.center);
-  });
-
-  test('copyWith updates stops', () {
-    final config = mockValidConfig();
-
-    final updated = config.copyWith(stops: [0.2, 0.8]);
-
-    expect(updated.stops, [0.2, 0.8]);
-    expect(updated.values, config.values);
-  });
-
-  test('copyWith updates values', () {
-    final config = mockValidConfig();
-
-    final updated = config.copyWith(values: [0.3, 0.6]);
-
-    expect(updated.stops, config.stops);
-    expect(updated.values, [0.3, 0.6]);
+    expect(copiedConfig.distribution, equals(config.distribution));
   });
 
   test('copyWith throws when too many or no sigma provided', () {
     expect(
       () => InspireBlurConfig(
         sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(sigmaX: 5),
       throwsAssertionError,
     );
     expect(
       () => InspireBlurConfig(
         sigma: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(sigmaY: 5),
       throwsAssertionError,
     );
     expect(
       () => InspireBlurConfig(
         sigmaX: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(sigma: 5),
       throwsAssertionError,
     );
     expect(
       () => InspireBlurConfig(
         sigmaY: 5,
-        start: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0, 1],
-        values: [0, 1],
+        distribution: DirectionalDistribution(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0, 1],
+          values: [0, 1],
+        ),
       ).copyWith(sigma: 5),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when start equals end', () {
-    expect(
-      () => mockValidConfig().copyWith(
-        start: const Alignment(0.25, 0.25),
-        end: const Alignment(0.25, 0.25),
-      ),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when not at least 2 blur stops provided', () {
-    expect(
-      () => mockValidConfig().copyWith(stops: []),
-      throwsAssertionError,
-    );
-    expect(
-      () => mockValidConfig().copyWith(stops: [0]),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when not at least 2 blur values provided', () {
-    expect(
-      () => mockValidConfig().copyWith(values: []),
-      throwsAssertionError,
-    );
-    expect(
-      () => mockValidConfig().copyWith(values: [0]),
-      throwsAssertionError,
-    );
-  });
-
-  test('copyWith throws when mismatched stops and values provided', () {
-    expect(
-      () => mockValidConfig().copyWith(
-        stops: [0, 1],
-        values: [0, 0.5, 1],
-      ),
-      throwsAssertionError,
-    );
-    expect(
-      () => mockValidConfig().copyWith(
-        stops: [0, 0.5, 1],
-        values: [0, 1],
-      ),
       throwsAssertionError,
     );
   });
@@ -785,22 +369,6 @@ void main() {
     /// Different [sigma] and [sigmaY] values
     expect(InspireBlurConfig.topToBottom(sigma: 5),
         isNot(equals(InspireBlurConfig.topToBottom(sigmaY: 5))));
-
-    /// Different [start] value
-    expect(mockValidConfig().copyWith(start: Alignment.topLeft),
-        isNot(equals(mockValidConfig().copyWith(start: Alignment.center))));
-
-    /// Different [end] value
-    expect(mockValidConfig().copyWith(end: Alignment.topLeft),
-        isNot(equals(mockValidConfig().copyWith(end: Alignment.center))));
-
-    /// Different [stops] value
-    expect(mockValidConfig().copyWith(stops: [0.222, 1.0]),
-        isNot(equals(mockValidConfig().copyWith(stops: [0.333, 1.0]))));
-
-    /// Different [values] value
-    expect(mockValidConfig().copyWith(values: [0.222, 1.0]),
-        isNot(equals(mockValidConfig().copyWith(values: [0.333, 1.0]))));
   });
 
   test('Configs with same values are equal', () {
@@ -815,22 +383,6 @@ void main() {
     /// Same [sigmaY] value
     expect(InspireBlurConfig.topToBottom(sigmaY: 5),
         equals(InspireBlurConfig.topToBottom(sigmaY: 5)));
-
-    /// Same [start] value
-    expect(mockValidConfig().copyWith(start: Alignment.center),
-        equals(mockValidConfig().copyWith(start: Alignment.center)));
-
-    /// Same [end] value
-    expect(mockValidConfig().copyWith(end: Alignment.center),
-        equals(mockValidConfig().copyWith(end: Alignment.center)));
-
-    /// Same [stops] value
-    expect(mockValidConfig().copyWith(stops: [0.222, 1.0]),
-        equals(mockValidConfig().copyWith(stops: [0.222, 1.0])));
-
-    /// Same [values] value
-    expect(mockValidConfig().copyWith(values: [0.222, 1.0]),
-        equals(mockValidConfig().copyWith(values: [0.222, 1.0])));
   });
 
   test('Configs with same values have same hashCode', () {
@@ -845,22 +397,6 @@ void main() {
     /// Same [sigmaY] value
     expect(InspireBlurConfig.topToBottom(sigmaY: 5).hashCode,
         equals(InspireBlurConfig.topToBottom(sigmaY: 5).hashCode));
-
-    /// Same [start] value
-    expect(mockValidConfig().copyWith(start: Alignment.center).hashCode,
-        equals(mockValidConfig().copyWith(start: Alignment.center).hashCode));
-
-    /// Same [end] value
-    expect(mockValidConfig().copyWith(end: Alignment.center).hashCode,
-        equals(mockValidConfig().copyWith(end: Alignment.center).hashCode));
-
-    /// Same [stops] value
-    expect(mockValidConfig().copyWith(stops: [0.222, 1.0]).hashCode,
-        equals(mockValidConfig().copyWith(stops: [0.222, 1.0]).hashCode));
-
-    /// Same [values] value
-    expect(mockValidConfig().copyWith(values: [0.222, 1.0]).hashCode,
-        equals(mockValidConfig().copyWith(values: [0.222, 1.0]).hashCode));
   });
 
   test('Configs with different directions are not equal', () {
@@ -874,23 +410,7 @@ void main() {
         isNot(equals(InspireBlurConfig.leftToRight(sigma: 5))));
 
     expect(InspireBlurConfig.topToBottom(sigma: 5),
-        isNot(equals(InspireBlurConfig.uniform(sigma: 5))));
-  });
-
-  test('External mutation affects config (documented behavior)', () {
-    final stops = [0.0, 1.0];
-
-    final config = InspireBlurConfig(
-      sigma: 5,
-      start: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: stops,
-      values: [1, 0],
-    );
-
-    stops.add(0.5);
-
-    expect(config.stops.length, 3);
+        isNot(equals(InspireBlurConfig.solid(sigma: 5))));
   });
 
   test('topToBottom produces correct config', () {
@@ -899,14 +419,17 @@ void main() {
     expect(config.sigma, 5);
     expect(config.sigmaX, null);
     expect(config.sigmaY, null);
-    expect(config.start, Alignment.topCenter);
-    expect(config.end, Alignment.bottomCenter);
-    expect(config.stops.first, 0.0);
-    expect(config.stops.last, 1.0);
-    expect(config.values.first, 1.0);
-    expect(config.values.last, 0.0);
-    _expectIncreasing(config.stops);
-    _expectDecreasing(config.values);
+
+    final distribution = config.distribution as DirectionalDistribution;
+
+    expect(distribution.begin, Alignment.topCenter);
+    expect(distribution.end, Alignment.bottomCenter);
+    expect(distribution.stops.first, 0.0);
+    expect(distribution.stops.last, 1.0);
+    expect(distribution.values.first, 1.0);
+    expect(distribution.values.last, 0.0);
+    expectIncreasing(distribution.stops);
+    expectDecreasing(distribution.values);
   });
 
   test('bottomToTop produces correct config', () {
@@ -915,14 +438,17 @@ void main() {
     expect(config.sigma, 5);
     expect(config.sigmaX, null);
     expect(config.sigmaY, null);
-    expect(config.start, Alignment.bottomCenter);
-    expect(config.end, Alignment.topCenter);
-    expect(config.stops.first, 0.0);
-    expect(config.stops.last, 1.0);
-    expect(config.values.first, 1.0);
-    expect(config.values.last, 0.0);
-    _expectIncreasing(config.stops);
-    _expectDecreasing(config.values);
+
+    final distribution = config.distribution as DirectionalDistribution;
+
+    expect(distribution.begin, Alignment.bottomCenter);
+    expect(distribution.end, Alignment.topCenter);
+    expect(distribution.stops.first, 0.0);
+    expect(distribution.stops.last, 1.0);
+    expect(distribution.values.first, 1.0);
+    expect(distribution.values.last, 0.0);
+    expectIncreasing(distribution.stops);
+    expectDecreasing(distribution.values);
   });
 
   test('leftToRight produces correct config', () {
@@ -931,14 +457,17 @@ void main() {
     expect(config.sigma, 5);
     expect(config.sigmaX, null);
     expect(config.sigmaY, null);
-    expect(config.start, Alignment.centerLeft);
-    expect(config.end, Alignment.centerRight);
-    expect(config.stops.first, 0.0);
-    expect(config.stops.last, 1.0);
-    expect(config.values.first, 1.0);
-    expect(config.values.last, 0.0);
-    _expectIncreasing(config.stops);
-    _expectDecreasing(config.values);
+
+    final distribution = config.distribution as DirectionalDistribution;
+
+    expect(distribution.begin, Alignment.centerLeft);
+    expect(distribution.end, Alignment.centerRight);
+    expect(distribution.stops.first, 0.0);
+    expect(distribution.stops.last, 1.0);
+    expect(distribution.values.first, 1.0);
+    expect(distribution.values.last, 0.0);
+    expectIncreasing(distribution.stops);
+    expectDecreasing(distribution.values);
   });
 
   test('rightToLeft produces correct config', () {
@@ -947,50 +476,50 @@ void main() {
     expect(config.sigma, 5);
     expect(config.sigmaX, null);
     expect(config.sigmaY, null);
-    expect(config.start, Alignment.centerRight);
-    expect(config.end, Alignment.centerLeft);
-    expect(config.stops.first, 0.0);
-    expect(config.stops.last, 1.0);
-    expect(config.values.first, 1.0);
-    expect(config.values.last, 0.0);
-    _expectIncreasing(config.stops);
-    _expectDecreasing(config.values);
+
+    final distribution = config.distribution as DirectionalDistribution;
+
+    expect(distribution.begin, Alignment.centerRight);
+    expect(distribution.end, Alignment.centerLeft);
+    expect(distribution.stops.first, 0.0);
+    expect(distribution.stops.last, 1.0);
+    expect(distribution.values.first, 1.0);
+    expect(distribution.values.last, 0.0);
+    expectIncreasing(distribution.stops);
+    expectDecreasing(distribution.values);
   });
 
   test('directional produces correct config', () {
     final config = InspireBlurConfig.directional(
       sigma: 5,
-      start: Alignment.topLeft,
+      begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
 
     expect(config.sigma, 5);
     expect(config.sigmaX, null);
     expect(config.sigmaY, null);
-    expect(config.start, Alignment.topLeft);
-    expect(config.end, Alignment.bottomRight);
-    expect(config.stops.first, 0.0);
-    expect(config.stops.last, 1.0);
-    expect(config.values.first, 1.0);
-    expect(config.values.last, 0.0);
-    _expectIncreasing(config.stops);
-    _expectDecreasing(config.values);
+
+    final distribution = config.distribution as DirectionalDistribution;
+
+    expect(distribution.begin, Alignment.topLeft);
+    expect(distribution.end, Alignment.bottomRight);
+    expect(distribution.stops.first, 0.0);
+    expect(distribution.stops.last, 1.0);
+    expect(distribution.values.first, 1.0);
+    expect(distribution.values.last, 0.0);
+    expectIncreasing(distribution.stops);
+    expectDecreasing(distribution.values);
   });
 
   test('uniform produces correct config', () {
-    final config = InspireBlurConfig.uniform(sigma: 5);
+    final config = InspireBlurConfig.solid(sigma: 5);
 
     expect(config.sigma, 5);
     expect(config.sigmaX, null);
     expect(config.sigmaY, null);
-    expect(config.start, Alignment.topCenter);
-    expect(config.end, Alignment.bottomCenter);
-    expect(config.stops.first, 0.0);
-    expect(config.stops.last, 1.0);
-    expect(config.values.first, 1.0);
-    expect(config.values.last, 1.0);
-    _expectIncreasing(config.stops);
-    _expectUniform(config.values);
+
+    expect(config.distribution, isA<UniformDistribution>());
   });
 
   test('Throws when extent is outside [0,1] range', () {
@@ -1032,7 +561,7 @@ void main() {
 
     expect(
       () => InspireBlurConfig.directional(
-        start: Alignment.topLeft,
+        begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         extent: -0.1,
       ),
@@ -1040,7 +569,7 @@ void main() {
     );
     expect(
       () => InspireBlurConfig.directional(
-        start: Alignment.topLeft,
+        begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         extent: 1.1,
       ),
@@ -1054,25 +583,10 @@ void main() {
       extent: 0.0,
     );
 
-    expect(config.stops, [0.0, 1.0]);
-    expect(config.values.length, 2);
+    final distribution = config.distribution as DirectionalDistribution;
+
+    expect(distribution.stops, [0.0, 0.0]);
+    expect(distribution.values, [1.0, 0.0]);
+    expect(distribution.values.length, 2);
   });
-}
-
-void _expectIncreasing(List<double> values) {
-  for (int i = 1; i < values.length; i++) {
-    expect(values[i], greaterThan(values[i - 1]));
-  }
-}
-
-void _expectDecreasing(List<double> values) {
-  for (int i = 1; i < values.length; i++) {
-    expect(values[i], lessThan(values[i - 1]));
-  }
-}
-
-void _expectUniform(List<double> values) {
-  for (int i = 1; i < values.length; i++) {
-    expect(values[i], equals(values[i - 1]));
-  }
 }

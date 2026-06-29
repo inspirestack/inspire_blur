@@ -1,6 +1,6 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:inspire_blur/src/child_blur/inspire_child_blur_animated_sampler_pass.dart';
 import 'package:inspire_blur/src/child_blur/inspire_child_blur_image_filter_pass.dart';
 import 'package:inspire_blur/src/inspire_backdrop_blur.dart';
@@ -9,30 +9,45 @@ import 'package:inspire_blur/src/inspire_blur_mode.dart';
 import 'package:inspire_blur/src/inspire_blur_wrapper.dart';
 import 'package:inspire_blur/src/utils/inspire_mode_resolver.dart';
 
-/// Applies a blur effect to the [child].
+/// Applies a blur effect to the [child] widget.
 ///
-/// Unlike [InspireBackdropBlur], this widget only blurs its own content
+/// Unlike [InspireBackdropBlur], this widget only blurs its content inside
 /// and does not sample or modify the background.
 ///
 /// The blur is applied directly to the rendered output of [child],
 /// making it suitable for blurring specific UI elements without
 /// affecting the surrounding scene (e.g. cards or images).
-///
-/// Behavior and performance:
-///
-/// By default, the blur effect is clipped to the bounds of this widget.
-/// Disabling clipping may cause the blur to extend beyond the widget bounds.
-///
-/// A [RepaintBoundary] is used by default to optimize rendering.
-/// In some cases (e.g. scrolling in nested lists), disabling it may
-/// result in more accurate blur updates, at the expense of performance.
 class InspireChildBlur extends StatelessWidget {
+  /// Configuration of the child blur.
+  ///
+  /// Specifies the strength and spatial distribution of the blur effect.
   final InspireBlurConfig config;
+
+  /// Rendering mode of the child blur mode.
+  ///
+  /// By default, the mode will be resolved automatically.
   final InspireBlurMode mode;
+
+  /// Defines how the blur effect is clipped.
+  ///
+  /// Disabling clipping allows the blur to extend beyond widget bounds.
   final Clip clipBehavior;
+
+  /// Whether to isolate the widget into a [RepaintBoundary].
+  ///
+  /// Can improve rendering performance and stability.
+  ///
+  /// In some cases, disabling it may produce more accurate blur updates,
+  /// such as in deeply nested scrollable lists.
   final bool useRepaintBoundary;
+
+  /// Child widget to which the blur effect will be applied.
   final Widget child;
 
+  /// Creates a blur for the [child] with given [config].
+  ///
+  /// For performance and stability adjustments, refer to documentation of the
+  /// [clipBehavior] and [useRepaintBoundary].
   const InspireChildBlur({
     super.key,
     this.mode = InspireBlurMode.auto,
@@ -55,11 +70,11 @@ class InspireChildBlur extends StatelessWidget {
         final gradientMap = builderData.blurGradientMap;
 
         // Gradient map is not ready yet — skip a frame with no blur.
-        // Typically it should not happen, unless device is slow.
+        // Typically it should not happen, unless during very low performance.
         if (gradientMap == null) return child;
 
-        final sigmaHorizontal = config.overallSigmaHorizontally();
-        final sigmaVertical = config.overallSigmaVertically();
+        final sigmaHorizontal = config.effectiveSigmaX;
+        final sigmaVertical = config.effectiveSigmaY;
 
         if (sigmaHorizontal != null &&
             sigmaVertical != null &&

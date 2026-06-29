@@ -2,7 +2,12 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
 import 'package:inspire_blur/src/inspire_blur_mode.dart';
+import 'package:inspire_blur/src/utils/extensions/inspire_double_extensions.dart';
 
+/// Resolves the best blur mode to use.
+///
+/// If the user-preferred mode is unavailable (e.g. due to no Impeller
+/// support), an alternative fallback will be chosen instead.
 InspireBlurResolvedMode resolveBlurMode({
   required BuildContext context,
   required InspireBlurMode userPreferredMode,
@@ -44,7 +49,7 @@ bool _isTransforming(BuildContext context) {
 
   // Check if transformation matrix is more than just a simple translation
   return !transform.isIdentity() &&
-      (transform.getColumn(0).length != 1.0 || // X scale
-          transform.getColumn(1).length != 1.0 || // Y scale
-          transform.getRotation().isIdentity() == false); // Rotation
+      (transform.getColumn(0).length.isNotCloseTo(1.0) || // X scale
+          transform.getColumn(1).length.isNotCloseTo(1.0) || // Y scale
+          !transform.getRotation().isIdentity()); // Rotation
 }

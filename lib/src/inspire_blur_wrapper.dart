@@ -1,9 +1,9 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:inspire_blur/src/distribution/blur_distribution_map.dart';
 import 'package:inspire_blur/src/inspire_blur_config.dart';
-import 'package:inspire_blur/src/utils/inspire_bounds_observer.dart';
+import 'package:inspire_blur/src/utils/layout/inspire_bounds_observer.dart';
 
 class InspireBlurWrapperData {
   final ui.Image? blurGradientMap;
@@ -57,13 +57,7 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   void didUpdateWidget(covariant InspireBlurWrapper oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final oldConfig = oldWidget.config;
-    final config = widget.config;
-
-    if (!listEquals(oldConfig.stops, config.stops) ||
-        !listEquals(oldConfig.values, config.values) ||
-        oldConfig.start != config.start ||
-        oldConfig.end != config.end) {
+    if (oldWidget.config.distribution != widget.config.distribution) {
       _regenerateBlurGradientMapIfNeeded(force: true);
     }
   }
@@ -85,14 +79,12 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: InspireBoundsObserver(
-        builder: (globalBounds) => widget.builder(
-          context,
-          InspireBlurWrapperData(
-            blurGradientMap: _blurGradientMap,
-            globalBounds: globalBounds,
-          ),
+    return InspireBoundsObserver(
+      builder: (globalBounds) => widget.builder(
+        context,
+        InspireBlurWrapperData(
+          blurGradientMap: _blurGradientMap,
+          globalBounds: globalBounds,
         ),
       ),
     );
@@ -101,7 +93,11 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   Future<void> _createNewBlurGradientMap(int size) async {
     final gen = ++_blurGradientMapGeneration;
 
-    final newMap = await _createBlurGradient(size, size);
+    final distributionMap = widget.config.distribution.toDistributionMap(
+      size: size,
+    );
+
+    final newMap = await distributionMap.toImage();
 
     if (gen != _blurGradientMapGeneration) {
       newMap.dispose();
@@ -118,30 +114,5 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   }
 
   int _getBlurGradientMaskSize() =>
-      (_screenLongestSide ~/ 2).toInt().clamp(64, 768);
-
-  Future<ui.Image> _createBlurGradient(int width, int height) async {
-    final config = widget.config;
-
-    final recorder = ui.PictureRecorder();
-    final canvas = ui.Canvas(recorder);
-
-    final size = Size(width.toDouble(), height.toDouble());
-    final rect = Offset.zero & size;
-
-    final paint = Paint()
-      ..shader = LinearGradient(
-        colors: config.values
-            .map((v) => Color.fromARGB(255, (v * 255).round(), 0, 0))
-            .toList(),
-        stops: config.stops,
-        begin: config.start,
-        end: config.end,
-      ).createShader(rect);
-
-    canvas.drawRect(rect, paint);
-
-    final picture = recorder.endRecording();
-    return picture.toImage(width, height);
-  }
+      (_screenLongestSide * 0.75).round().clamp(256, 1024);
 }

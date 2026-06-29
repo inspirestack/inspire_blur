@@ -1,6 +1,6 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_shaders/flutter_shaders.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
 
@@ -35,7 +35,7 @@ class _InspireChildBlurAnimatedSamplerPassState
 
   void _loadShader() {
     InspireShaders.childBlur.then((program) {
-      final shader = program.fragmentShader();
+      final shader = program?.fragmentShader();
       if (mounted) {
         setState(() => _shader = shader);
       } else {
@@ -64,7 +64,7 @@ class _InspireChildBlurAnimatedSamplerPassState
           ..setImageSampler(1, widget.gradientMap)
           ..setFloat(0, size.width)
           ..setFloat(1, size.height)
-          // Ensure 1:1 effective blur strength with ImageFilter.shader variant
+          // To ensure 1:1 effective blur strength with ImageFilter.shader
           // when using same sigma values — divide sigma by dpr.
           ..setFloat(2, widget.sigma / dpr)
           ..setFloat(3, widget.direction == Axis.horizontal ? 1.0 : 0.0)

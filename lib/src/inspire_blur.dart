@@ -1,16 +1,23 @@
-import 'package:flutter/material.dart';
-import 'package:inspire_blur/inspire_blur.dart';
+import 'package:flutter/widgets.dart';
+import 'package:inspire_blur/src/inspire_backdrop_blur.dart';
+import 'package:inspire_blur/src/inspire_blur_config.dart';
+import 'package:inspire_blur/src/inspire_blur_mode.dart';
+import 'package:inspire_blur/src/inspire_child_blur.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
+import 'package:inspire_blur/src/inspire_tint_api.dart';
 
+/// API for the Inspire Blur widgets and utilities.
+///
+/// Provides convenient factories for child blur and backdrop blur.
 class Inspire {
   const Inspire._();
 
-  /// Preloads shaders used by Inspire.
+  /// Preloads shaders used by Inspire Blur.
   ///
   /// This can help avoid a minor frame drop the first time a blur is rendered,
   /// especially on lower-end devices.
   ///
-  /// Calling this is **optional** — shaders are loaded lazily on first use
+  /// Calling this is optional — shaders are loaded lazily on first use
   /// anyway, and in most cases this works perfectly fine.
   ///
   /// Consider using this if you want to ensure perfectly smooth first-time
@@ -18,10 +25,10 @@ class Inspire {
   ///
   /// If used, call this early in your app lifecycle, for example:
   /// - in `main()` before `runApp()`
-  /// - in a splash screen or initial loading phase
+  /// - during a splash screen or initial loading phase
   ///
-  /// This is most useful when blur is used in animations or
-  /// immediately visible UI.
+  /// This is most useful when blur appears immediately on screen
+  /// or is used in animations and transitions.
   static Future<void> warmUp() async {
     try {
       await InspireShaders.backdropBlur;
@@ -35,9 +42,8 @@ class Inspire {
   ///
   /// This is typically used for overlays, glass effects, or backgrounds.
   ///
-  /// The [child] is drawn on top of the blurred background.
-  ///
-  /// It works in a similar way as the [BackdropFilter].
+  /// Similar to [BackdropFilter], the [child] is drawn on top of
+  /// the blurred background.
   static Widget backdropBlur({
     required InspireBlurConfig config,
     Clip clipBehavior = Clip.antiAlias,
@@ -52,7 +58,7 @@ class Inspire {
     );
   }
 
-  /// Blurs only the given [child] (local blur).
+  /// Blurs only the given [child] (widget-level blur).
   ///
   /// This is useful for blurring specific UI elements such as cards,
   /// images, or components without affecting the background.
@@ -72,5 +78,6 @@ class Inspire {
     );
   }
 
+  /// API for the Inspire color tint widgets.
   static final tint = const InspireTintApi();
 }

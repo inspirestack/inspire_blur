@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:inspire_blur/inspire_blur.dart';
+import 'package:inspire_blur/src/inspire_backdrop_blur.dart';
+import 'package:inspire_blur/src/inspire_blur.dart';
+import 'package:inspire_blur/src/inspire_blur_config.dart';
+import 'package:inspire_blur/src/inspire_child_blur.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
 
 void main() {

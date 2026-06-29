@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:inspire_blur/src/utils/inspire_utils.dart';
+import 'package:flutter/widgets.dart';
+import 'package:inspire_blur/src/utils/layout/inspire_layout_extensions.dart';
 
 class InspireBoundsObserver extends StatefulWidget {
   const InspireBoundsObserver({
@@ -16,13 +16,13 @@ class InspireBoundsObserver extends StatefulWidget {
 class _InspireBoundsObserverState extends State<InspireBoundsObserver> {
   final _wrapperBoxKey = GlobalKey();
 
-  bool _boundsUpdateBuild = true;
-  Rect? _bounds;
+  bool _isBoundsUpdateBuild = true;
   bool _callbackScheduled = false;
+  Rect? _bounds;
 
   @override
   Widget build(BuildContext context) {
-    if (!_callbackScheduled && !_boundsUpdateBuild) {
+    if (!_callbackScheduled && !_isBoundsUpdateBuild) {
       _callbackScheduled = true;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -32,7 +32,7 @@ class _InspireBoundsObserverState extends State<InspireBoundsObserver> {
       });
     }
 
-    _boundsUpdateBuild = false;
+    _isBoundsUpdateBuild = false;
 
     return SizedBox(
       key: _wrapperBoxKey,
@@ -44,7 +44,7 @@ class _InspireBoundsObserverState extends State<InspireBoundsObserver> {
     final newBounds = _wrapperBoxKey.getGlobalRenderBoxBounds();
 
     if (newBounds != null && newBounds != _bounds) {
-      _boundsUpdateBuild = true;
+      _isBoundsUpdateBuild = true;
       setState(() => _bounds = newBounds);
     }
   }

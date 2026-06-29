@@ -1,9 +1,10 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
-import 'package:inspire_blur/src/utils/inspire_utils.dart';
+import 'package:inspire_blur/src/utils/extensions/inspire_double_extensions.dart';
+import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.dart';
 
 class InspireChildBlurImageFilterPass extends StatefulWidget {
   final ui.Image gradientMap;
@@ -36,30 +37,15 @@ class _InspireChildBlurImageFilterPassState
 
   void _loadShader() {
     InspireShaders.childBlur.then((program) {
-      final shader = program.fragmentShader();
+      final shader = program?.fragmentShader();
       if (mounted) {
         setState(() {
           _shader = shader;
-          _updateShader();
         });
       } else {
         _shader = shader;
-        _updateShader();
       }
     });
-  }
-
-  @override
-  void didUpdateWidget(covariant InspireChildBlurImageFilterPass oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _updateShader();
-  }
-
-  void _updateShader() {
-    _shader?.setImageSampler(1, widget.gradientMap);
-    _shader?.setFloat(2, widget.sigma);
-    _shader?.setFloat(3, widget.direction == Axis.horizontal ? 1.0 : 0.0);
-    _shader?.setFloat(4, widget.direction == Axis.vertical ? 1.0 : 0.0);
   }
 
   @override
@@ -75,6 +61,9 @@ class _InspireChildBlurImageFilterPassState
 
     return _BlurFiltered(
       shader: shader,
+      gradientMap: widget.gradientMap,
+      direction: widget.direction,
+      sigma: widget.sigma,
       child: widget.child,
     );
   }
@@ -82,10 +71,16 @@ class _InspireChildBlurImageFilterPassState
 
 class _BlurFiltered extends SingleChildRenderObjectWidget {
   final ui.FragmentShader shader;
+  final ui.Image gradientMap;
+  final Axis direction;
+  final double sigma;
 
   const _BlurFiltered({
     super.child,
     required this.shader,
+    required this.gradientMap,
+    required this.direction,
+    required this.sigma,
   });
 
   @override
@@ -95,6 +90,9 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
 
     return _BlurFilterRenderObject(
       shader,
+      gradientMap,
+      direction,
+      sigma,
       scrollPosition,
       _getScreenSize(view),
       _getDpr(context),
@@ -111,6 +109,9 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
 
     renderObject
       ..shader = shader
+      ..gradientMap = gradientMap
+      ..direction = direction
+      ..sigma = sigma
       ..scrollPosition = scrollPosition
       ..screenSize = _getScreenSize(view)
       ..dpr = _getDpr(context);
@@ -124,29 +125,49 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
 }
 
 class _BlurFilterRenderObject extends RenderProxyBox {
-  final Paint _cachedPaint = Paint();
+  ui.ImageFilter? _imageFilter;
 
   ui.FragmentShader _shader;
   set shader(ui.FragmentShader value) {
     if (identical(_shader, value)) return;
     _shader = value;
-    markNeedsPaint();
+    _updateShader();
+  }
+
+  ui.Image _gradientMap;
+  set gradientMap(ui.Image value) {
+    if (_gradientMap == value) return;
+    _gradientMap = value;
+    _updateShader();
+  }
+
+  Axis _direction;
+  set direction(Axis value) {
+    if (_direction == value) return;
+    _direction = value;
+    _updateShader();
+  }
+
+  double _sigma;
+  set sigma(double value) {
+    if (_sigma == value) return;
+    _sigma = value;
+    _updateShader();
   }
 
   Size _screenSize;
   set screenSize(Size value) {
     if (_screenSize == value) return;
     _screenSize = value;
+    markNeedsPaint();
   }
 
   double _dpr;
   set dpr(double value) {
     if (_dpr == value) return;
     _dpr = value;
+    markNeedsPaint();
   }
-
-  Rect? _lastPaintedBounds;
-  bool? _wasFullyVisible;
 
   ScrollPosition? _scrollPosition;
   set scrollPosition(ScrollPosition? value) {
@@ -158,10 +179,18 @@ class _BlurFilterRenderObject extends RenderProxyBox {
 
   _BlurFilterRenderObject(
     this._shader,
+    this._gradientMap,
+    this._direction,
+    this._sigma,
     this._scrollPosition,
     this._screenSize,
     this._dpr,
-  );
+  ) {
+    _updateShader();
+  }
+
+  Rect? _lastPaintedBounds;
+  bool? _wasFullyVisible;
 
   void _attachListener() {
     if (!attached) return;
@@ -215,6 +244,20 @@ class _BlurFilterRenderObject extends RenderProxyBox {
     return true;
   }
 
+  void _updateShader() {
+    _shader.setImageSampler(1, _gradientMap);
+    _shader.setFloat(2, _sigma);
+    _shader.setFloat(3, _direction == Axis.horizontal ? 1.0 : 0.0);
+    _shader.setFloat(4, _direction == Axis.vertical ? 1.0 : 0.0);
+
+    _recreateImageFilter();
+    markNeedsPaint();
+  }
+
+  void _recreateImageFilter() {
+    _imageFilter = ui.ImageFilter.shader(_shader);
+  }
+
   @override
   void paint(PaintingContext context, ui.Offset offset) {
     final childValue = child;
@@ -239,11 +282,11 @@ class _BlurFilterRenderObject extends RenderProxyBox {
       _shader.setFloat(7, deltaRight * _dpr);
       _shader.setFloat(8, deltaBottom * _dpr);
 
-      _cachedPaint.imageFilter = ui.ImageFilter.shader(_shader);
+      _imageFilter = ui.ImageFilter.shader(_shader);
     }
 
     final ImageFilterLayer filterLayer = ImageFilterLayer(
-      imageFilter: _cachedPaint.imageFilter,
+      imageFilter: _imageFilter,
     );
 
     context.pushLayer(filterLayer,

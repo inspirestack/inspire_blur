@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:inspire_blur/src/utils/inspire_utils.dart';
+import 'package:inspire_blur/src/utils/inspire_stops_generator.dart';
 
 class InspireTint extends StatelessWidget {
   const InspireTint({
@@ -10,8 +10,8 @@ class InspireTint extends StatelessWidget {
     required this.begin,
     required this.end,
     required this.curve,
-    this.stopsCount = 7,
-    this.child,
+    required this.child,
+    this.stopsCount = 16,
   });
 
   final Color color;
@@ -25,28 +25,28 @@ class InspireTint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (extent <= 0) return child ?? const SizedBox.shrink();
+    if (extent <= 0.0 || opacity <= 0.0) {
+      return child ?? const SizedBox.shrink();
+    }
 
-    final opacityFactors = curveToStops(
-      extent: extent,
+    final opacityControlPoints = curveToValuesAndStops(
+      endStop: extent,
       curve: curve,
       stopsCount: stopsCount,
     );
 
-    return IgnorePointer(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: begin,
-            end: end,
-            stops: opacityFactors.map((e) => e.$1).toList(),
-            colors: opacityFactors
-                .map((e) => color.withValues(alpha: e.$2 * opacity))
-                .toList(),
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: begin,
+          end: end,
+          colors: opacityControlPoints
+              .map((e) => color.withValues(alpha: e.$1 * opacity))
+              .toList(),
+          stops: opacityControlPoints.map((e) => e.$2).toList(),
         ),
-        child: child,
       ),
+      child: child,
     );
   }
 }

@@ -337,7 +337,13 @@ However, this comes with an associated performance cost. Using a large number of
 
 If you encounter performance issues, consider reducing the blur sigma or limiting the area where the effect is applied. Additionally, limit the number of distinct blur effects displayed at once.
 
-### Troubleshooting
+## Compatibility
+
+iOS and Android platforms are fully supported.
+
+On Web, only child blur with `InspireBlurMode.animatedSampler` is supported.
+
+## Troubleshooting
 
 > **My blur effect is too slow or starts lagging**
 >
@@ -365,19 +371,19 @@ If you encounter performance issues, consider reducing the blur sigma or limitin
 >
 > This limitation originates from Flutter’s platform view rendering architecture.
 
-### Best Practices
+## Best Practices
 
-#### Optimize First Launch
+### Optimize First Launch
 
 It is recommended to call `Inspire.warmUp()` on app startup, for example during a splash screen. This function preloads the shaders used by the effects.
 
 While not required, this is a useful optimization that ensures the blur effect renders immediately when first used, avoiding potential frame drops — especially on lower-end devices.
 
-#### Reduce Sigma on Lower-end Devices
+### Reduce Sigma on Lower-end Devices
 
 Consider choosing lower sigma values for better performance. On lower-end devices, sigma values above `8-13` may become expensive depending on the layout complexity and number of active blur effects.
 
-#### Scale Sigma With Screen Resolution
+### Scale Sigma With Screen Resolution
 
 Blur strength is perceived differently depending on the screen resolution. On smaller screens, lower sigma values may produce a visually similar result to higher sigma values on larger screens. For extra consistency it is advised to scale sigma depending on the screen resolution.
 

@@ -23,8 +23,8 @@ class EllipseDistribution extends GradientDistribution {
 
   /// Inverts the distribution of the gradient.
   ///
-  /// - When [false], blur starts inside and fades outwards.
-  /// - When [true], blur starts outside and fades inwards.
+  /// - When `false`, blur starts inside and fades outwards.
+  /// - When `true`, blur starts outside and fades inwards.
   final bool inverse;
 
   /// Creates an ellipse blur distribution configuration.

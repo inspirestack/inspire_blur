@@ -38,7 +38,6 @@ void main() {
 
   #ifdef IMPELLER_TARGET_OPENGLES
     uv.y = 1.0 - uv.y;
-    uv_blur.y = 1.0 - uv_blur.y;
   #endif
 
   vec4 bg = texture(u_texture, uv);

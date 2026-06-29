@@ -54,6 +54,10 @@ void main() {
   vec2 areaUV = (uv - areaTopLeftUV) / (areaBottomRightUV - areaTopLeftUV);
   areaUV = clamp(areaUV, vec2(0.0), vec2(1.0));
 
+#ifdef IMPELLER_TARGET_OPENGLES
+  areaUV.y = 1.0 - areaUV.y;
+#endif
+
   vec4 bg = texture(u_texture, uv);
   float blurFactor = clamp(texture(u_blur_texture, areaUV).r, 0.0, 1.0);
 

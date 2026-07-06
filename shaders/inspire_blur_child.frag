@@ -26,13 +26,47 @@ uniform float u_blur_sigma;
 // An already normalized (0,1) or (1,0) direction vector.
 uniform vec2 u_blur_direction;
 
+// --- Screen position correction params ---
 uniform vec2 u_delta_left_top;
 uniform vec2 u_delta_right_bottom;
+
+// --- Transformation params ---
+uniform vec2 u_transform_scale;
+uniform vec2 u_transform_offset;
+uniform float u_transform_rotation;
+uniform float u_transform_inversion;
+uniform vec2 u_transform_origin;
+
+vec2 transformUv(vec2 uv) {
+  // Move to origin
+  uv -= u_transform_origin;
+
+  // Undo translation
+  uv -= u_transform_offset;
+
+  // Undo rotation
+  float c = cos(-u_transform_rotation);
+  float s = sin(-u_transform_rotation);
+
+  uv = mat2(
+    c, -s,
+    s, c
+  ) * uv;
+
+  // Undo scale
+  uv /= sign(u_transform_scale) * max(abs(u_transform_scale), vec2(0.0001));
+
+  // Restore origin
+  uv += u_transform_origin;
+
+  return uv;
+}
 
 void main() {
   vec2 xy = FlutterFragCoord().xy;
   vec2 uv = xy / u_size;
   vec2 uv_blur = (xy + u_delta_left_top) / (u_size + u_delta_left_top + u_delta_right_bottom);
+  uv_blur = transformUv(uv_blur);
 
   vec2 texel = 1.0 / u_size;
 
@@ -41,7 +75,13 @@ void main() {
   #endif
 
   vec4 bg = texture(u_texture, uv);
-  float blurFactor = clamp(texture(u_blur_texture, uv_blur).r, 0.0, 1.0);
+  float blurFactor = texture(u_blur_texture, uv_blur).r;
+  blurFactor = mix(
+    blurFactor,
+    1.0 - blurFactor,
+    u_transform_inversion
+  );
+  blurFactor = clamp(blurFactor, 0.0, 1.0);
 
   float sigma = u_blur_sigma * blurFactor;
 

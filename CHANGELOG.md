@@ -1,3 +1,15 @@
+## 0.3.0
+
+### Added
+
+- **Custom mask**
+  - Added `customMask()` for defining any arbitrary blur distributions using an `Image`.
+  - Works with both child and backdrop blur.
+- **Blur transformations**
+  - Added `BlurTransform` for applying blur distribution transformations, including: scale, offset, rotation, and inversion.
+  - Works with both child and backdrop blur.
+  - All transformation properties are fully animatable.
+
 ## 0.2.0
 
 ### Added

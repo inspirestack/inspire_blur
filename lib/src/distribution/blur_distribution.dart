@@ -1,9 +1,12 @@
+import 'dart:ui' as ui show Image;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 part 'package:inspire_blur/src/distribution/models/directional_distribution.dart';
 part 'package:inspire_blur/src/distribution/models/ellipse_distribution.dart';
 part 'package:inspire_blur/src/distribution/models/gradient_distribution.dart';
+part 'package:inspire_blur/src/distribution/models/image_mask_distribution.dart';
 part 'package:inspire_blur/src/distribution/models/rrect_distribution.dart';
 part 'package:inspire_blur/src/distribution/models/uniform_distribution.dart';
 

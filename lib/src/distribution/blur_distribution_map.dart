@@ -2,8 +2,10 @@ import 'dart:typed_data' show Uint8List;
 import 'dart:ui' as ui;
 
 import 'package:inspire_blur/src/distribution/blur_distribution.dart';
+import 'package:inspire_blur/src/distribution/blur_distribution_image.dart';
 import 'package:inspire_blur/src/distribution/maps/directional_distribution_map.dart';
 import 'package:inspire_blur/src/distribution/maps/ellipse_distribution_map.dart';
+import 'package:inspire_blur/src/distribution/maps/image_mask_distribution_map.dart';
 import 'package:inspire_blur/src/distribution/maps/rrect_distribution_map.dart';
 import 'package:inspire_blur/src/distribution/maps/uniform_distribution_map.dart';
 
@@ -16,7 +18,20 @@ abstract class BlurDistributionMap {
   final int width;
   final int height;
 
-  Future<ui.Image> toImage() => _pixelsToImage(_generatePixels());
+  Future<BlurDistributionImage> getBlurDistributionImage();
+}
+
+abstract class IntensityBasedDistributionMap extends BlurDistributionMap {
+  const IntensityBasedDistributionMap({
+    required super.width,
+    required super.height,
+  });
+
+  @override
+  Future<BlurDistributionImage> getBlurDistributionImage() async {
+    final image = await _pixelsToImage(_generatePixels());
+    return BlurDistributionImage.owned(image);
+  }
 
   Uint8List _generatePixels() {
     const rgba8888BytesPerPixel = 4;
@@ -34,8 +49,8 @@ abstract class BlurDistributionMap {
       for (int x = 0; x < width; x++) {
         final u = x * invWidth;
 
-        final intensity = intensityAt(u, v).clamp(0.0, 1.0);
-        final color = (intensity * 255.0).round();
+        final intensity = intensityAt(u, v);
+        final color = (intensity.clamp(0.0, 1.0) * 255).round();
 
         pixels[offset++] = color;
         pixels[offset++] = color;
@@ -86,7 +101,6 @@ extension BlurDistributionExtension on BlurDistribution {
             radiusX: e.radiusX,
             radiusY: e.radiusY,
             center: e.center,
-            inverse: e.inverse,
             values: e.values,
             stops: e.stops,
           ),
@@ -96,9 +110,13 @@ extension BlurDistributionExtension on BlurDistribution {
             horizontalInset: e.horizontalInset,
             verticalInset: e.verticalInset,
             cornerRadius: e.cornerRadius,
-            inverse: e.inverse,
             values: e.values,
             stops: e.stops,
+          ),
+        ImageMaskDistribution e => ImageMaskDistributionMap(
+            width: e.maskImage.width,
+            height: e.maskImage.height,
+            maskImage: e.maskImage,
           ),
       };
 }

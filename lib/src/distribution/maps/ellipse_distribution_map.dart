@@ -23,12 +23,6 @@ class EllipseDistributionMap extends GradientDistributionMap {
   /// Center point of the ellipse represented in UV coordinates.
   final Offset centerUV;
 
-  /// Inverts the distribution of the gradient.
-  ///
-  /// - When [false], blur starts inside and fades outwards.
-  /// - When [true], blur starts outside and fades inwards.
-  final bool inverse;
-
   EllipseDistributionMap({
     required super.width,
     required super.height,
@@ -37,7 +31,6 @@ class EllipseDistributionMap extends GradientDistributionMap {
     required this.radiusX,
     required this.radiusY,
     required this.center,
-    required this.inverse,
   }) : centerUV = center.toNormalizedOffset();
 
   @override
@@ -49,8 +42,6 @@ class EllipseDistributionMap extends GradientDistributionMap {
 
     final d = sqrt(dx * dx + dy * dy);
 
-    final sampled = sampleGradient(d);
-
-    return inverse ? 1.0 - sampled : sampled;
+    return sampleGradient(d);
   }
 }

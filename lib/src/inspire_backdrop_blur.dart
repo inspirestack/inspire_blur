@@ -5,6 +5,8 @@ import 'package:inspire_blur/src/inspire_blur_config.dart';
 import 'package:inspire_blur/src/inspire_blur_wrapper.dart';
 import 'package:inspire_blur/src/inspire_child_blur.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
+import 'package:inspire_blur/src/transform/blur_transform.dart';
+import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.dart';
 
 /// Applies a blur effect to the content behind this widget.
 ///
@@ -91,6 +93,7 @@ class InspireBackdropBlur extends StatelessWidget {
                   Positioned.fill(
                     child: _InspireBackdropBlurPass(
                       gradientMap: gradientMap,
+                      transform: config.transform,
                       globalBounds: globalBounds,
                       direction: Axis.horizontal,
                       sigma: sigmaHorizontal,
@@ -99,6 +102,7 @@ class InspireBackdropBlur extends StatelessWidget {
                   Positioned.fill(
                     child: _InspireBackdropBlurPass(
                       gradientMap: gradientMap,
+                      transform: config.transform,
                       globalBounds: globalBounds,
                       direction: Axis.vertical,
                       sigma: sigmaVertical,
@@ -116,6 +120,7 @@ class InspireBackdropBlur extends StatelessWidget {
             child: _maybeWrapWithRepaintBoundary(
               child: _InspireBackdropBlurPass(
                 gradientMap: gradientMap,
+                transform: config.transform,
                 globalBounds: globalBounds,
                 direction: Axis.horizontal,
                 sigma: sigmaHorizontal,
@@ -130,6 +135,7 @@ class InspireBackdropBlur extends StatelessWidget {
             child: _maybeWrapWithRepaintBoundary(
               child: _InspireBackdropBlurPass(
                 gradientMap: gradientMap,
+                transform: config.transform,
                 globalBounds: globalBounds,
                 direction: Axis.vertical,
                 sigma: sigmaVertical,
@@ -159,6 +165,7 @@ class InspireBackdropBlur extends StatelessWidget {
 
 class _InspireBackdropBlurPass extends StatefulWidget {
   final ui.Image gradientMap;
+  final BlurTransform transform;
   final Rect globalBounds;
   final Axis direction;
   final double sigma;
@@ -166,6 +173,7 @@ class _InspireBackdropBlurPass extends StatefulWidget {
 
   const _InspireBackdropBlurPass({
     required this.gradientMap,
+    required this.transform,
     required this.globalBounds,
     required this.direction,
     required this.sigma,
@@ -210,6 +218,8 @@ class _InspireBackdropBlurPassState extends State<_InspireBackdropBlurPass> {
   void _updateShader() {
     final dpr = MediaQuery.of(context).devicePixelRatio;
 
+    final normalizedOrigin = widget.transform.origin.toNormalizedOffset();
+
     _shader?.setImageSampler(1, widget.gradientMap);
     _shader?.setFloat(2, widget.sigma);
     _shader?.setFloat(3, widget.direction == Axis.horizontal ? 1.0 : 0.0);
@@ -218,6 +228,14 @@ class _InspireBackdropBlurPassState extends State<_InspireBackdropBlurPass> {
     _shader?.setFloat(6, widget.globalBounds.top * dpr);
     _shader?.setFloat(7, widget.globalBounds.width * dpr);
     _shader?.setFloat(8, widget.globalBounds.height * dpr);
+    _shader?.setFloat(9, widget.transform.scale.scaleX);
+    _shader?.setFloat(10, widget.transform.scale.scaleY);
+    _shader?.setFloat(11, widget.transform.offset.dx);
+    _shader?.setFloat(12, widget.transform.offset.dy);
+    _shader?.setFloat(13, widget.transform.rotation);
+    _shader?.setFloat(14, widget.transform.inversionFactor);
+    _shader?.setFloat(15, normalizedOrigin.dx);
+    _shader?.setFloat(16, normalizedOrigin.dy);
   }
 
   @override

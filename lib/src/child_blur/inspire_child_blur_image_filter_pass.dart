@@ -3,11 +3,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
+import 'package:inspire_blur/src/transform/blur_transform.dart';
 import 'package:inspire_blur/src/utils/extensions/inspire_double_extensions.dart';
 import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.dart';
 
 class InspireChildBlurImageFilterPass extends StatefulWidget {
   final ui.Image gradientMap;
+  final BlurTransform transform;
   final Axis direction;
   final double sigma;
   final Widget child;
@@ -15,6 +17,7 @@ class InspireChildBlurImageFilterPass extends StatefulWidget {
   const InspireChildBlurImageFilterPass({
     super.key,
     required this.gradientMap,
+    required this.transform,
     required this.direction,
     required this.sigma,
     required this.child,
@@ -62,6 +65,7 @@ class _InspireChildBlurImageFilterPassState
     return _BlurFiltered(
       shader: shader,
       gradientMap: widget.gradientMap,
+      transform: widget.transform,
       direction: widget.direction,
       sigma: widget.sigma,
       child: widget.child,
@@ -72,6 +76,7 @@ class _InspireChildBlurImageFilterPassState
 class _BlurFiltered extends SingleChildRenderObjectWidget {
   final ui.FragmentShader shader;
   final ui.Image gradientMap;
+  final BlurTransform transform;
   final Axis direction;
   final double sigma;
 
@@ -79,6 +84,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
     super.child,
     required this.shader,
     required this.gradientMap,
+    required this.transform,
     required this.direction,
     required this.sigma,
   });
@@ -91,6 +97,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
     return _BlurFilterRenderObject(
       shader,
       gradientMap,
+      transform,
       direction,
       sigma,
       scrollPosition,
@@ -110,6 +117,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
     renderObject
       ..shader = shader
       ..gradientMap = gradientMap
+      ..transform = transform
       ..direction = direction
       ..sigma = sigma
       ..scrollPosition = scrollPosition
@@ -138,6 +146,13 @@ class _BlurFilterRenderObject extends RenderProxyBox {
   set gradientMap(ui.Image value) {
     if (_gradientMap == value) return;
     _gradientMap = value;
+    _updateShader();
+  }
+
+  BlurTransform _transform;
+  set transform(BlurTransform value) {
+    if (_transform == value) return;
+    _transform = value;
     _updateShader();
   }
 
@@ -180,6 +195,7 @@ class _BlurFilterRenderObject extends RenderProxyBox {
   _BlurFilterRenderObject(
     this._shader,
     this._gradientMap,
+    this._transform,
     this._direction,
     this._sigma,
     this._scrollPosition,
@@ -245,10 +261,20 @@ class _BlurFilterRenderObject extends RenderProxyBox {
   }
 
   void _updateShader() {
+    final normalizedOrigin = _transform.origin.toNormalizedOffset();
+
     _shader.setImageSampler(1, _gradientMap);
     _shader.setFloat(2, _sigma);
     _shader.setFloat(3, _direction == Axis.horizontal ? 1.0 : 0.0);
     _shader.setFloat(4, _direction == Axis.vertical ? 1.0 : 0.0);
+    _shader.setFloat(9, _transform.scale.scaleX);
+    _shader.setFloat(10, _transform.scale.scaleY);
+    _shader.setFloat(11, _transform.offset.dx);
+    _shader.setFloat(12, _transform.offset.dy);
+    _shader.setFloat(13, _transform.rotation);
+    _shader.setFloat(14, _transform.inversionFactor);
+    _shader.setFloat(15, normalizedOrigin.dx);
+    _shader.setFloat(16, normalizedOrigin.dy);
 
     _recreateImageFilter();
     markNeedsPaint();

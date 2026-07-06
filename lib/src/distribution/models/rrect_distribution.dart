@@ -27,12 +27,6 @@ final class RRectDistribution extends GradientDistribution {
   /// maximum corner rounding for the given shape.
   final double cornerRadius;
 
-  /// Controls the blur direction:
-  /// - `false`: blur starts inside the shape and fades outward.
-  /// - `true`: blur starts outside the shape and fades toward the center,
-  ///   creating a vignette-like effect.
-  final bool inverse;
-
   /// Creates a rounded rectangle blur distribution configuration.
   ///
   /// The blur intensity is distributed according to the gradient
@@ -43,7 +37,6 @@ final class RRectDistribution extends GradientDistribution {
     required this.horizontalInset,
     required this.verticalInset,
     required this.cornerRadius,
-    required this.inverse,
   }) : assert(
           cornerRadius >= 0.0 && cornerRadius <= 1.0,
           'cornerRadius must be in the range [0.0, 1.0]',
@@ -57,14 +50,12 @@ final class RRectDistribution extends GradientDistribution {
     double? horizontalInset,
     double? verticalInset,
     double? cornerRadius,
-    bool? inverse,
     List<double>? values,
     List<double>? stops,
   }) {
     final newHorizontalInset = horizontalInset ?? this.horizontalInset;
     final newVerticalInset = verticalInset ?? this.verticalInset;
     final newCornerRadius = cornerRadius ?? this.cornerRadius;
-    final newInverse = inverse ?? this.inverse;
     final newValues = values ?? this.values;
     final newStops = stops ?? this.stops;
 
@@ -72,7 +63,6 @@ final class RRectDistribution extends GradientDistribution {
       horizontalInset: newHorizontalInset,
       verticalInset: newVerticalInset,
       cornerRadius: newCornerRadius,
-      inverse: newInverse,
       values: newValues,
       stops: newStops,
     );
@@ -86,7 +76,6 @@ final class RRectDistribution extends GradientDistribution {
         other.horizontalInset == horizontalInset &&
         other.verticalInset == verticalInset &&
         other.cornerRadius == cornerRadius &&
-        other.inverse == inverse &&
         gradientDistributionEquals(other);
   }
 
@@ -95,7 +84,15 @@ final class RRectDistribution extends GradientDistribution {
         horizontalInset,
         verticalInset,
         cornerRadius,
-        inverse,
         gradientDistributionHashCode(),
       );
+
+  @override
+  String toString() => 'RRectDistribution('
+      'horizontalInset: $horizontalInset, '
+      'verticalInset: $verticalInset, '
+      'cornerRadius: $cornerRadius, '
+      'values: [List of ${values.length} items], '
+      'stops: [List of ${stops.length} items]'
+      ')';
 }

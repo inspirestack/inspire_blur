@@ -6,7 +6,6 @@ class RRectDistributionMap extends GradientDistributionMap {
   final double horizontalInset;
   final double verticalInset;
   final double cornerRadius;
-  final bool inverse;
 
   late final double left;
   late final double right;
@@ -31,7 +30,6 @@ class RRectDistributionMap extends GradientDistributionMap {
     required this.horizontalInset,
     required this.verticalInset,
     required this.cornerRadius,
-    required this.inverse,
   }) {
     left = horizontalInset;
     right = 1.0 - horizontalInset;
@@ -72,9 +70,7 @@ class RRectDistributionMap extends GradientDistributionMap {
     final position =
         centerDistance == 0.0 ? 1.0 : 1.0 + signedDistance / centerDistance;
 
-    final sampled = sampleGradient(position);
-
-    return inverse ? 1.0 - sampled : sampled;
+    return sampleGradient(position);
   }
 
   static double _signedDistanceToRRect({

@@ -66,4 +66,12 @@ final class DirectionalDistribution extends GradientDistribution {
         end,
         gradientDistributionHashCode(),
       );
+
+  @override
+  String toString() => 'DirectionalDistribution('
+      'begin: $begin, '
+      'end: $end, '
+      'values: [List of ${values.length} items], '
+      'stops: [List of ${stops.length} items]'
+      ')';
 }

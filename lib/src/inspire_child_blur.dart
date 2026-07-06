@@ -159,6 +159,7 @@ class InspireChildBlur extends StatelessWidget {
     return switch (resolvedMode) {
       InspireBlurResolvedMode.imageFilter => InspireChildBlurImageFilterPass(
           gradientMap: gradientMap,
+          transform: config.transform,
           direction: direction,
           sigma: sigma,
           child: child,
@@ -166,6 +167,7 @@ class InspireChildBlur extends StatelessWidget {
       InspireBlurResolvedMode.animatedSampler =>
         InspireChildBlurAnimatedSamplerPass(
           gradientMap: gradientMap,
+          transform: config.transform,
           direction: direction,
           sigma: sigma,
           child: child,

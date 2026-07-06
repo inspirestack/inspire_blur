@@ -10,4 +10,14 @@ class UniformDistribution extends BlurDistribution {
   /// Returns a copy of this distribution.
   @override
   UniformDistribution copyWith() => const UniformDistribution();
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is UniformDistribution;
+
+  @override
+  int get hashCode => 0;
+
+  @override
+  String toString() => 'UniformDistribution';
 }

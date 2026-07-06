@@ -17,3 +17,5 @@ export 'src/inspire_blur_config.dart' show InspireBlurConfig;
 export 'src/inspire_blur_mode.dart' show InspireBlurMode;
 export 'src/inspire_child_blur.dart' show InspireChildBlur;
 export 'src/inspire_tint_api.dart' show InspireTintApi;
+export 'src/model/blur_scale.dart' show BlurScale;
+export 'src/transform/blur_transform.dart' show BlurTransform;

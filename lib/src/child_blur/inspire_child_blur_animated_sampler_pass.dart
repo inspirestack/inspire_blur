@@ -3,9 +3,12 @@ import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_shaders/flutter_shaders.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
+import 'package:inspire_blur/src/transform/blur_transform.dart';
+import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.dart';
 
 class InspireChildBlurAnimatedSamplerPass extends StatefulWidget {
   final ui.Image gradientMap;
+  final BlurTransform transform;
   final Axis direction;
   final double sigma;
   final Widget child;
@@ -13,6 +16,7 @@ class InspireChildBlurAnimatedSamplerPass extends StatefulWidget {
   const InspireChildBlurAnimatedSamplerPass({
     super.key,
     required this.gradientMap,
+    required this.transform,
     required this.direction,
     required this.sigma,
     required this.child,
@@ -59,6 +63,8 @@ class _InspireChildBlurAnimatedSamplerPassState
       (image, size, canvas) {
         final dpr = MediaQuery.of(context).devicePixelRatio;
 
+        final normalizedOrigin = widget.transform.origin.toNormalizedOffset();
+
         shader
           ..setImageSampler(0, image)
           ..setImageSampler(1, widget.gradientMap)
@@ -72,7 +78,15 @@ class _InspireChildBlurAnimatedSamplerPassState
           ..setFloat(5, 0.0)
           ..setFloat(6, 0.0)
           ..setFloat(7, 0.0)
-          ..setFloat(8, 0.0);
+          ..setFloat(8, 0.0)
+          ..setFloat(9, widget.transform.scale.scaleX)
+          ..setFloat(10, widget.transform.scale.scaleY)
+          ..setFloat(11, widget.transform.offset.dx)
+          ..setFloat(12, widget.transform.offset.dy)
+          ..setFloat(13, widget.transform.rotation)
+          ..setFloat(14, widget.transform.inversionFactor)
+          ..setFloat(15, normalizedOrigin.dx)
+          ..setFloat(16, normalizedOrigin.dy);
         final paint = Paint()..shader = shader;
         canvas.drawRect(Offset.zero & size, paint);
       },

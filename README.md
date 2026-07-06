@@ -59,35 +59,42 @@ Run the example app to see interactive demos, including both backdrop and child 
 
 ## Why another blur package?
 
-Flutter currently does not provide a built-in progressive blur widget.
-Inspire Blur provides:
+Flutter currently does not provide a built-in blur widget with variable strength.
 
-- Progressive variable blur
-- Directional, radial and rectangular distributions
-- Child and backdrop blur modes
+**Inspire Blur provides:**
+
+- Progressive/variable blur
+- Any custom shape masked blur
+- Child and backdrop blur widgets
+- Dynamic blur that works well with animations
 - GPU shaders optimized for Impeller
-- Automatic fallback for wider compatibility
+- Automatic fallback for compatibility
 
-## Blur Modes
+## Blur Widgets
 
-Inspire Blur supports two ways of applying blur:
+Inspire Blur has two distinct blur widgets:
 
-- **Backdrop blur** — blurs the content that’s _behind_ it.
-- **Child blur** — blurs the content that’s _inside_ it.
+- **Backdrop blur widget** — a widget that blurs the content _behind_ it.
+- **Child blur widget** — a widget that blurs the content _inside_ it.
 
----
+### Backdrop Blur
 
-**Backdrop blur** works best when applied over large, dynamic areas, such as screens, scaffolds, lists, grids, or carousels. It blurs any content rendered beneath it, making it ideal for scene-level effects.
+Best suited for large, dynamic areas, such as screens, scaffolds, lists, grids, or carousels. It blurs any content rendered behind it, making it ideal for broad scene-level effects.
 
-A common use case is a top screen fade, where the blur effect starts under the status bar, and gradually fades out.
+#### Common Examples
 
----
+- **Top screen edge blur** — blur effect starts under the status bar, and gradually fades out.
+- **Bottom screen edge blur** — blur effect can gradually soften the content under the navigation bar.
 
-**Child blur** is ideal for standalone UI elements like cards, images, or small components. It works by wrapping the widget that should be blurred.
+### Child Blur
 
-One common use case is a card with a background image and text on top. Inspire Blur can render a blur effect with a gradually fading intensity, allowing the text to stand out more against the background.
+Ideal for standalone UI elements like cards, images, or small components. It works by wrapping the widget that should be blurred.
 
-### Choosing a Blur Mode
+#### Common Examples
+
+- **Card with a background image and text on top** — blur effect with a gradually fading intensity that makes the text and icons stand out more on top of the background.
+
+### Choosing Blur Mode
 
 Both blur modes can produce similar visual effects, but they are designed for different scenarios. Choosing the appropriate mode helps ensure the best stability and performance.
 
@@ -106,7 +113,7 @@ import 'package:inspire_blur/inspire_blur.dart';
 
 ### Applying Child Blur
 
-Wrap the widget that should be blurred with `Inspire.childBlur()`.
+Wrap the widget that should be blurred with `Inspire.childBlur()`:
 
 ```dart
 Inspire.childBlur(
@@ -136,12 +143,10 @@ Stack(
 
 It is recommended to call `Inspire.warmUp()` during app startup to ensure blur effects render immediately when first displayed.
 
-## Presets
-
-Inspire Blur config includes ready-to-use presets for the most typical use cases.
+## Blur Presets
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/blur-patterns-0.2.0.webp" width="800">
+  <img src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/blur-patterns-0.3.0.webp" width="800">
 </p>
 
 ### Directional Blur
@@ -171,7 +176,7 @@ The `inverse` parameter inverts the blur distribution. The blur normally starts 
 
 Choose a custom `fadeCurve` to control how the blur intensity is gradually smoothened out. The default curve is `Curves.easeOutSine` which produces a smoother, more gradual fade that is distributed across the gradient in a more natural way visually.
 
-#### Ellipse blur
+#### Ellipse Blur
 
 For an elliptical blur, use:
 
@@ -179,7 +184,7 @@ For an elliptical blur, use:
 InspireBlurConfig.ellipse()
 ```
 
-#### Rectangle blur
+#### Rectangle Blur
 
 For a rectangular blur, use:
 
@@ -187,7 +192,7 @@ For a rectangular blur, use:
 InspireBlurConfig.rectangle()
 ```
 
-#### Rounded rectangle blur
+#### Rounded Rectangle Blur
 
 For a rounded rectangular blur, use:
 
@@ -195,15 +200,27 @@ For a rounded rectangular blur, use:
 InspireBlurConfig.roundedRectangle()
 ```
 
+### Custom Mask Blur
+
+For an arbitrary custom blur distribution, use:
+
+```dart
+InspireBlurConfig.customMask()
+```
+
+Provide a grayscale `ui.Image` with a recommended size between 64x64 to 1024x1024 pixels. The brightness at each pixel controls the blur intensity of the corresponding blur area.
+
+_Note: To get the best accuracy, use an image with an aspect ratio matching the component which is being blurred._
+
 ### Uniform Blur
 
-To apply a uniform blur across the entire area, use:
+To apply a uniform blur over the entire area, use:
 
 ```dart
 InspireBlurConfig.solid()
 ```
 
-### Color Tint
+## Color Tint
 
 To apply a color tint to the blurred area of a widget, use one of the factory methods from `Inspire.tint`. Tinting adds a distinct accent color helping to soften the blur transition. This results in a more natural, integrated appearance.
 
@@ -216,12 +233,12 @@ The `extent` parameter defines how far the tint effect extends.
 | Child blur    | Wrap the `Inspire.childBlur` _inside_ the tint widget.                   |
 | Backdrop blur | Place the tint widget _after_ the `Inspire.backdropBlur` in the `Stack`. |
 
-#### Tint Example
+### Example of Tint Application
 
-See below for an example of tint applied to a child blur with specific configuration values. The color was chosen arbitrarily, but it's recommended to use a color palette generator to pick an accent color programmatically.
+See the below example of a tint applied to a child blur. In this example the light blue color was picked by hand, but for a real scenario it is recommended to use a color palette generator to get the accent color from an image automatically.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/tint-comparison.webp" alt="Comparison of progressive blur with and without color tint" width="480">
+  <img src="https://raw.githubusercontent.com/inspirestack/inspire_blur/main/assets/readme/tint-comparison.webp" alt="Comparison of progressive blur with and without color tint" width="720">
 </p>
 
 ```dart
@@ -238,7 +255,7 @@ Inspire.tint.bottomToTop(
 
 ## Blur Configuration
 
-### Sigma
+### Blur Sigma
 
 Blur strength is defined by sigma values:
 
@@ -246,15 +263,15 @@ Blur strength is defined by sigma values:
 - `sigmaX` — horizontal blur
 - `sigmaY` — vertical blur
 
-`sigma` is mutually exclusive with `sigmaX` and `sigmaY`.
+`sigma` cannot be combined with `sigmaX` and `sigmaY`.
 
 Using only `sigmaX` produces a horizontal blur, while using only `sigmaY` produces a vertical blur.
 
-| Configuration   | Usage                                                    |
-| :-------------- | :------------------------------------------------------- |
-| **Uniform**     | Provide `sigma` for equal blur on both axes.             |
-| **Directional** | Provide `sigmaX` or `sigmaY` for single-axis blur.       |
-| **Asymmetric**  | Provide both `sigmaX` and `sigmaY` for varying strength. |
+| Configuration   | Usage                                                                       |
+| :-------------- | :-------------------------------------------------------------------------- |
+| **Uniform**     | Provide `sigma` for equal blur on both axes.                                |
+| **Directional** | Provide `sigmaX` or `sigmaY` for single-axis blur.                          |
+| **Asymmetric**  | Provide both `sigmaX` and `sigmaY` for uneven blur strength along the axes. |
 
 _Examples:_
 
@@ -273,9 +290,9 @@ InspireBlurConfig.topToBottom(sigma: 5, sigmaX: 3) // 2D and 1D sigma cannot be 
 InspireBlurConfig.topToBottom(sigmaX: 5, sigmaY: 5) // Same as `sigma: 5`
 ```
 
-### Extent
+### Blur Extent
 
-Progressive blur does not have to span the entire area. To shorten the spread of the blur effect, use the `extent` property. It specifies the point at which the blur effect stops.
+Progressive blur does not have to span the entire widget area. Use the `extent` property to produce only a partial blur distribution. For example a value of `0.5` will make the blur end at half way through the area.
 
 Values greater than `1.0` are also supported, allowing the blur transition to extend beyond the widget bounds.
 
@@ -289,7 +306,19 @@ For example:
 
 The blur strength is distributed according to the selected fade curve, allowing you to fine-tune how quickly the blur intensity progresses across the area.
 
-The default is `Curves.easeInSine`, which produces a natural, more gradual soft edge blur fade. For a regular linear gradient blur progression, use `Curves.linear`.
+The default is `Curves.easeInSine`, which produces a natural, more gradual soft edge blur fade that is progressing more softly. For a regular linear gradient blur progression, use `Curves.linear`.
+
+### Blur Transform
+
+To transform blur distribution, use `InspireBlurConfig.transform` property. All the values of `BlurTransform` can be smoothly animated.
+
+| Property            | Application                                                              |
+| :------------------ | :----------------------------------------------------------------------- |
+| **scale**           | Enlarges or shrinks the blur distribution. Negative values mirror it.    |
+| **offset**          | Translates the blur distribution horizontally and vertically.            |
+| **rotation**        | Rotates the blur distribution around the origin.                         |
+| **origin**          | Specifies the origin point around which the transformation is performed. |
+| **inversionFactor** | Inverts the blur distribution.                                           |
 
 ## How It Works
 
@@ -395,14 +424,14 @@ Blur strength is perceived differently depending on the screen resolution. On sm
 
 ## Support the Project
 
-If `inspire_blur` helped you build a beautiful, high-quality UI, consider giving the package a 👍 on [pub.dev](https://pub.dev/packages/inspire_blur) and a ⭐️ on [GitHub](https://github.com/inspirestack/inspire_blur). It helps other developers discover the project.
+If Inspire Blur helped you build a beautiful UI for your app, consider giving it a 👍 on [pub.dev](https://pub.dev/packages/inspire_blur) and a ⭐️ on [GitHub](https://github.com/inspirestack/inspire_blur). It helps other developers discover the project.
 
-If you'd like to support the project's continued development, you can also buy InspireStack a virtual cup of coffee.
+### Package Funding
 
-☕️ [**Support InspireStack on Buy Me a Coffee**](https://buymeacoffee.com/inspirestack)
+If you'd like to support the ongoing development of Inspire Blur, you can also [buy InspireStack a cup of coffee ☕️](https://buymeacoffee.com/inspirestack).
 
 ### Share What You’ve Built!
 
-Did Inspire Blur turn out to be a great fit for your app? Share it with us! We’d love to feature your app. Find out how on [GitHub discussions](https://github.com/inspirestack/inspire_blur/discussions/categories/show-and-tell).
+Did Inspire Blur turn out to be a great fit for your app? Share it with us! We'd love to feature your app. You can find the template on our [GitHub](https://github.com/inspirestack/inspire_blur/discussions/categories/show-and-tell).
 
 _Help inspire the Flutter community by showcasing what custom GPU shaders can do!_

@@ -1,10 +1,13 @@
 name: inspire_blur
 description: A modern, high-performance progressive blur for Flutter — powered by custom GPU shaders.
-version: 0.2.0
+version: 0.3.0
 
 homepage: https://inspirestack.app/inspire-blur
 repository: https://github.com/inspirestack/inspire_blur
 issue_tracker: https://github.com/inspirestack/inspire_blur/issues
+
+funding:
+  - https://buymeacoffee.com/inspirestack
 
 topics:
   - blur

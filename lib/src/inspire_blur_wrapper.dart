@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
+import 'package:inspire_blur/src/distribution/blur_distribution_image.dart';
 import 'package:inspire_blur/src/distribution/blur_distribution_map.dart';
 import 'package:inspire_blur/src/inspire_blur_config.dart';
 import 'package:inspire_blur/src/utils/layout/inspire_bounds_observer.dart';
@@ -9,10 +10,28 @@ class InspireBlurWrapperData {
   final ui.Image? blurGradientMap;
   final Rect? globalBounds;
 
-  InspireBlurWrapperData({
+  const InspireBlurWrapperData({
     required this.blurGradientMap,
     required this.globalBounds,
   });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is InspireBlurWrapperData &&
+        other.blurGradientMap == blurGradientMap &&
+        other.globalBounds == globalBounds;
+  }
+
+  @override
+  int get hashCode => Object.hash(blurGradientMap, globalBounds);
+
+  @override
+  String toString() => 'InspireBlurWrapperData('
+      'blurGradientMap: $blurGradientMap, '
+      'globalBounds: $globalBounds'
+      ')';
 }
 
 typedef InspireBlurWrapperBuilder = Widget Function(
@@ -36,7 +55,7 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   late double _screenLongestSide;
   bool _hasScreenSize = false;
 
-  ui.Image? _blurGradientMap;
+  BlurDistributionImage? _blurDistributionImage;
   int _blurGradientMapGeneration = 0;
   int? _blurGradientMapLastSize;
 
@@ -76,7 +95,7 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   @override
   void dispose() {
     _disposed = true;
-    _blurGradientMap?.dispose();
+    _blurDistributionImage?.dispose();
     super.dispose();
   }
 
@@ -86,7 +105,7 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
       builder: (globalBounds) => widget.builder(
         context,
         InspireBlurWrapperData(
-          blurGradientMap: _blurGradientMap,
+          blurGradientMap: _blurDistributionImage?.image,
           globalBounds: globalBounds,
         ),
       ),
@@ -100,19 +119,20 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
       size: size,
     );
 
-    final newMap = await distributionMap.toImage();
+    final newBlurDistributionImage =
+        await distributionMap.getBlurDistributionImage();
 
     if (_disposed || gen != _blurGradientMapGeneration) {
-      newMap.dispose();
+      newBlurDistributionImage.dispose();
       return;
     }
 
-    _blurGradientMap?.dispose();
+    _blurDistributionImage?.dispose();
 
     if (mounted) {
-      setState(() => _blurGradientMap = newMap);
+      setState(() => _blurDistributionImage = newBlurDistributionImage);
     } else {
-      _blurGradientMap = newMap;
+      _blurDistributionImage = newBlurDistributionImage;
     }
   }
 

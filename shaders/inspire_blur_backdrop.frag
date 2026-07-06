@@ -29,6 +29,38 @@ uniform vec2 u_blur_direction;
 uniform vec2 u_area_origin;
 uniform vec2 u_area_size;
 
+// --- Transformation params ---
+uniform vec2 u_transform_scale;
+uniform vec2 u_transform_offset;
+uniform float u_transform_rotation;
+uniform float u_transform_inversion;
+uniform vec2 u_transform_origin;
+
+vec2 transformUv(vec2 uv) {
+  // Move to origin
+  uv -= u_transform_origin;
+
+  // Undo translation
+  uv -= u_transform_offset;
+
+  // Undo rotation
+  float c = cos(-u_transform_rotation);
+  float s = sin(-u_transform_rotation);
+
+  uv = mat2(
+    c, -s,
+    s, c
+  ) * uv;
+
+  // Undo scale
+  uv /= sign(u_transform_scale) * max(abs(u_transform_scale), vec2(0.0001));
+
+  // Restore origin
+  uv += u_transform_origin;
+
+  return uv;
+}
+
 void main() {
   vec2 xy = FlutterFragCoord().xy;
   vec2 uv = xy / u_size;
@@ -58,8 +90,16 @@ void main() {
   areaUV.y = 1.0 - areaUV.y;
 #endif
 
+  areaUV = transformUv(areaUV);
+
   vec4 bg = texture(u_texture, uv);
-  float blurFactor = clamp(texture(u_blur_texture, areaUV).r, 0.0, 1.0);
+  float blurFactor = texture(u_blur_texture, areaUV).r;
+  blurFactor = mix(
+    blurFactor,
+    1.0 - blurFactor,
+    u_transform_inversion
+  );
+  blurFactor = clamp(blurFactor, 0.0, 1.0);
 
   float sigma = u_blur_sigma * blurFactor;
 

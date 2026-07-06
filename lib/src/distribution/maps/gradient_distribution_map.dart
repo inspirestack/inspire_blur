@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:inspire_blur/src/distribution/blur_distribution_map.dart';
 
-abstract class GradientDistributionMap extends BlurDistributionMap {
+abstract class GradientDistributionMap extends IntensityBasedDistributionMap {
   final List<double> values;
   final List<double> stops;
 

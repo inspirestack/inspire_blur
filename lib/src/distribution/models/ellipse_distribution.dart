@@ -21,23 +21,16 @@ class EllipseDistribution extends GradientDistribution {
   /// Center of the ellipse blur shape.
   final Alignment center;
 
-  /// Inverts the distribution of the gradient.
-  ///
-  /// - When `false`, blur starts inside and fades outwards.
-  /// - When `true`, blur starts outside and fades inwards.
-  final bool inverse;
-
   /// Creates an ellipse blur distribution configuration.
   ///
   /// The blur intensity is distributed according to the gradient defined by
-  /// [radiusX], [radiusY], [center], [inverse], [values], and [stops].
+  /// [radiusX], [radiusY], [center], [values], and [stops].
   EllipseDistribution({
     required super.values,
     required super.stops,
     required this.radiusX,
     required this.radiusY,
     required this.center,
-    required this.inverse,
   })  : assert(
           radiusX >= 0.0,
           'radiusX must be greater than or equal to 0.0',
@@ -55,14 +48,12 @@ class EllipseDistribution extends GradientDistribution {
     double? radiusX,
     double? radiusY,
     Alignment? center,
-    bool? inverse,
     List<double>? values,
     List<double>? stops,
   }) {
     final newRadiusX = radiusX ?? this.radiusX;
     final newRadiusY = radiusY ?? this.radiusY;
     final newCenter = center ?? this.center;
-    final newInverse = inverse ?? this.inverse;
     final newValues = values ?? this.values;
     final newStops = stops ?? this.stops;
 
@@ -70,7 +61,6 @@ class EllipseDistribution extends GradientDistribution {
       radiusX: newRadiusX,
       radiusY: newRadiusY,
       center: newCenter,
-      inverse: newInverse,
       values: newValues,
       stops: newStops,
     );
@@ -84,7 +74,6 @@ class EllipseDistribution extends GradientDistribution {
         other.radiusX == radiusX &&
         other.radiusY == radiusY &&
         other.center == center &&
-        other.inverse == inverse &&
         gradientDistributionEquals(other);
   }
 
@@ -93,7 +82,15 @@ class EllipseDistribution extends GradientDistribution {
         radiusX,
         radiusY,
         center,
-        inverse,
         gradientDistributionHashCode(),
       );
+
+  @override
+  String toString() => 'EllipseDistribution('
+      'radiusX: $radiusX, '
+      'radiusY: $radiusY, '
+      'center: $center, '
+      'values: [List of ${values.length} items], '
+      'stops: [List of ${stops.length} items]'
+      ')';
 }

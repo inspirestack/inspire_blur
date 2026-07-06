@@ -10,6 +10,12 @@
   - Works with both child and backdrop blur.
   - All transformation properties are fully animatable.
 
+### Changed
+
+- **Breaking changes**
+  - Replaced `InspireBlurConfig.inverse` with `BlurTransform.inversionFactor`.
+  - Inversion is now part of blur distribution transformations. The type has changed from `bool` to `double`, allowing smooth animation and finer control over the inversion amount.
+
 ## 0.2.0
 
 ### Added

@@ -170,11 +170,11 @@ InspireBlurConfig.directional()
 
 ### Shape-based Blur
 
-This type of blur has a non-uniform/variable distribution, where blur strength is determined by a shape.
+This type of blur has a non-uniform (variable) distribution, where the blur strength is determined by a shape.
 
-The `inverse` parameter inverts the blur distribution. The blur normally starts from the center and fades outward. If `inverse` is `true`, the blur will start from the outside and fade outside-in.
+The `BlurTransform.inversionFactor` property inverts the blur distribution. By default, the blur starts at the center and gradually fades outward. When `BlurTransform.inversionFactor` is `1.0`, the blur instead starts at full strength around the edges and gradually fades inward.
 
-Choose a custom `fadeCurve` to control how the blur intensity is gradually smoothened out. The default curve is `Curves.easeOutSine` which produces a smoother, more gradual fade that is distributed across the gradient in a more natural way visually.
+Choose a custom `fadeCurve` to control how the blur intensity is distributed across the transition. The default curve, `Curves.easeOutSine`, produces a more natural fade that is more visually smoothened out.
 
 #### Ellipse Blur
 

@@ -1,3 +1,11 @@
+## 0.3.1
+
+### Fixed
+
+- **Backdrop blur positioning**
+  - Added automatic screen-position updates for backdrop blur.
+  - Fixed backdrop blur misalignment during route transitions, such as Cupertino swipe-back gestures, and when used inside scrollable lists.
+
 ## 0.3.0
 
 ### Added

@@ -41,6 +41,24 @@ class InspireChildBlur extends StatelessWidget {
   /// such as in deeply nested scrollable lists.
   final bool useRepaintBoundary;
 
+  /// Allows to manually invalidate the cached screen position of the
+  /// blur effect.
+  ///
+  /// Set [layoutInvalidationKey] to a different value whenever the blur effect
+  /// should recalculate its position on the screen. The value can be a simple
+  /// integer counter.
+  ///
+  /// In most cases, this is not needed. The blur effect automatically tracks
+  /// changes to the blurred widget's position.
+  ///
+  /// This might be needed during advanced transitions or animations, where
+  /// the blur effect is not receiving a callback about the change of its
+  /// screen bounds.
+  ///
+  /// For example, this might be required when the blur widget is
+  /// transformed with [ScaleTransition] or [PositionedTransition].
+  final Object? layoutInvalidationKey;
+
   /// Child widget to which the blur effect will be applied.
   final Widget child;
 
@@ -53,6 +71,7 @@ class InspireChildBlur extends StatelessWidget {
     this.mode = InspireBlurMode.auto,
     this.clipBehavior = Clip.antiAlias,
     this.useRepaintBoundary = true,
+    this.layoutInvalidationKey,
     required this.config,
     required this.child,
   });
@@ -66,6 +85,7 @@ class InspireChildBlur extends StatelessWidget {
 
     return InspireBlurWrapper(
       config: config,
+      layoutInvalidationKey: layoutInvalidationKey,
       builder: (context, builderData) {
         final gradientMap = builderData.blurGradientMap;
 

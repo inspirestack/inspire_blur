@@ -83,8 +83,9 @@ Best suited for large, dynamic areas, such as screens, scaffolds, lists, grids, 
 
 #### Common Examples
 
-- **Top screen edge blur** — blur effect starts under the status bar, and gradually fades out.
-- **Bottom screen edge blur** — blur effect can gradually soften the content under the navigation bar.
+- **iOS-like system bars** — recreate the iOS blur effect beneath the status and navigation bars.
+- **Top screen edge blur** — gradually blur the content beneath the status bar.
+- **Bottom screen edge blur** — gradually blur the content beneath the navigation bar.
 
 ### Child Blur
 
@@ -202,15 +203,19 @@ InspireBlurConfig.roundedRectangle()
 
 ### Custom Mask Blur
 
-For an arbitrary custom blur distribution, use:
+The `customMask()` factory enables arbitrary spatial blur distributions that cannot be achieved with the built-in blur patterns.
+
+For an arbitrary blur distribution, use:
 
 ```dart
-InspireBlurConfig.customMask()
+InspireBlurConfig.customMask(
+  maskImage: ...
+)
 ```
 
-Provide a grayscale `ui.Image` with a recommended size between 64x64 to 1024x1024 pixels. The brightness at each pixel controls the blur intensity of the corresponding blur area.
+Provide a grayscale `maskImage` with a recommended resolution between 64×64 and 1024×1024 pixels. The image acts as a spatial blur map, where the brightness of each pixel determines the local blur intensity.
 
-_Note: To get the best accuracy, use an image with an aspect ratio matching the component which is being blurred._
+_Note: To prevent the effect from appearing stretched, use a `maskImage` with an aspect ratio matching the component being blurred._
 
 ### Uniform Blur
 

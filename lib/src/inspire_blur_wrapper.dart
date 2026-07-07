@@ -40,11 +40,13 @@ typedef InspireBlurWrapperBuilder = Widget Function(
 class InspireBlurWrapper extends StatefulWidget {
   final InspireBlurConfig config;
   final InspireBlurWrapperBuilder builder;
+  final Object? layoutInvalidationKey;
 
   const InspireBlurWrapper({
     super.key,
     required this.config,
     required this.builder,
+    required this.layoutInvalidationKey,
   });
 
   @override
@@ -102,11 +104,15 @@ class _InspireBlurWrapperState extends State<InspireBlurWrapper> {
   @override
   Widget build(BuildContext context) {
     return InspireBoundsObserver(
-      builder: (globalBounds) => widget.builder(
-        context,
-        InspireBlurWrapperData(
-          blurGradientMap: _blurDistributionImage?.image,
-          globalBounds: globalBounds,
+      layoutInvalidationKey: widget.layoutInvalidationKey,
+      builder: (context, boundsNotifier) => ValueListenableBuilder(
+        valueListenable: boundsNotifier,
+        builder: (context, globalBounds, child) => widget.builder(
+          context,
+          InspireBlurWrapperData(
+            blurGradientMap: _blurDistributionImage?.image,
+            globalBounds: globalBounds,
+          ),
         ),
       ),
     );

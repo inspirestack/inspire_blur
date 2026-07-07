@@ -48,12 +48,14 @@ class Inspire {
     required InspireBlurConfig config,
     Clip clipBehavior = Clip.antiAlias,
     bool useRepaintBoundary = true,
+    Object? layoutInvalidationKey,
     Widget? child,
   }) {
     return InspireBackdropBlur(
       config: config,
       clipBehavior: clipBehavior,
       useRepaintBoundary: useRepaintBoundary,
+      layoutInvalidationKey: layoutInvalidationKey,
       child: child,
     );
   }
@@ -68,12 +70,14 @@ class Inspire {
     InspireBlurMode mode = InspireBlurMode.auto,
     Clip clipBehavior = Clip.antiAlias,
     bool useRepaintBoundary = true,
+    Object? layoutInvalidationKey,
   }) {
     return InspireChildBlur(
       config: config,
       mode: mode,
       clipBehavior: clipBehavior,
       useRepaintBoundary: useRepaintBoundary,
+      layoutInvalidationKey: layoutInvalidationKey,
       child: child,
     );
   }

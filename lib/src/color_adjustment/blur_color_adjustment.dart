@@ -35,6 +35,9 @@ class BlurColorAdjustment {
   /// Value `0.0` keeps the original brightness.
   final double brightness;
 
+  /// Brightness value converted into a shader scale.
+  ///
+  /// For internal use only.
   double get shaderBrightness =>
       brightness.sign * _brightnessFactor * sqrt(brightness.abs());
 
@@ -45,6 +48,9 @@ class BlurColorAdjustment {
   /// Value `0.0` keeps the original contrast.
   final double contrast;
 
+  /// Contrast value converted into a shader scale.
+  ///
+  /// For internal use only.
   double get shaderContrast {
     if (contrast >= 0.0) return 1.0 + _positiveContrastFactor * sqrt(contrast);
 
@@ -62,6 +68,9 @@ class BlurColorAdjustment {
   /// Value `0.0` keeps the original exposure.
   final double exposure;
 
+  /// Exposure value converted into a shader scale.
+  ///
+  /// For internal use only.
   double get shaderExposure =>
       exposure.sign * _exposureFactor * sqrt(exposure.abs());
 
@@ -77,6 +86,9 @@ class BlurColorAdjustment {
   /// * Positive values progressively increase saturation.
   final double saturation;
 
+  /// Saturation value converted into a shader scale.
+  ///
+  /// For internal use only.
   double get shaderSaturation {
     if (saturation <= 0.0) {
       return (1.0 + saturation).coerceAtLeast(0.0);
@@ -97,6 +109,9 @@ class BlurColorAdjustment {
   /// * Positive values progressively increase vibrance.
   final double vibrance;
 
+  /// Vibrance value converted into a shader scale.
+  ///
+  /// For internal use only.
   double get shaderVibrance {
     if (vibrance <= 0.0) {
       return vibrance.coerceAtLeast(-1.0);

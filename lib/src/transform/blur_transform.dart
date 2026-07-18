@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/widgets.dart';
 import 'package:inspire_blur/src/model/blur_scale.dart';
 
@@ -19,7 +21,7 @@ class BlurTransform {
   /// Rotation of the blur distribution in radians.
   final double rotation;
 
-  /// Origin around which scaling and rotation are applied.
+  /// Point around which scaling and rotation are applied.
   ///
   /// Defaults to [Alignment.center].
   final Alignment origin;
@@ -32,8 +34,8 @@ class BlurTransform {
   /// Values outside this range extrapolate the effect, which can be useful
   /// for overshooting animations, such as [Curves.easeOutBack].
   ///
-  /// - 0.0 keeps the original map.
-  /// - 1.0 fully inverts the distribution map.
+  /// * Value `0.0` keeps the original map.
+  /// * Value `1.0` fully inverts the distribution map.
   final double inversionFactor;
 
   /// Neutral no-op transform that leaves the original distribution map intact.
@@ -49,6 +51,47 @@ class BlurTransform {
     this.origin = Alignment.center,
     this.inversionFactor = 0.0,
   });
+
+  /// Returns a copy of this distribution with the provided properties updated.
+  ///
+  /// Any parameter left `null` retains its current value.
+  BlurTransform copyWith({
+    BlurScale? scale,
+    Offset? offset,
+    double? rotation,
+    Alignment? origin,
+    double? inversionFactor,
+  }) {
+    return BlurTransform(
+      scale: scale ?? this.scale,
+      offset: offset ?? this.offset,
+      rotation: rotation ?? this.rotation,
+      origin: origin ?? this.origin,
+      inversionFactor: inversionFactor ?? this.inversionFactor,
+    );
+  }
+
+  /// Linearly interpolates between two [BlurTransform] objects.
+  ///
+  /// Enables seamless transitions inside implicit animations or tweens.
+  static BlurTransform lerp(
+    BlurTransform? a,
+    BlurTransform? b,
+    double t,
+  ) {
+    if (identical(a, b) && a != null) return a;
+
+    a ??= BlurTransform.identity;
+    b ??= BlurTransform.identity;
+
+    return BlurTransform(
+      scale: BlurScale.lerp(a.scale, b.scale, t),
+      offset: Offset.lerp(a.offset, b.offset, t)!,
+      rotation: lerpDouble(a.rotation, b.rotation, t)!,
+      origin: Alignment.lerp(a.origin, b.origin, t)!,
+      inversionFactor: lerpDouble(a.inversionFactor, b.inversionFactor, t)!,
+    );
+  }
 
   @override
   bool operator ==(Object other) {

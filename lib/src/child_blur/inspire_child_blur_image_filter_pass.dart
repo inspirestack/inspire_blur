@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:inspire_blur/src/color_adjustment/blur_color_adjustment.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
 import 'package:inspire_blur/src/transform/blur_transform.dart';
 import 'package:inspire_blur/src/utils/extensions/inspire_double_extensions.dart';
@@ -10,6 +11,7 @@ import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.da
 class InspireChildBlurImageFilterPass extends StatefulWidget {
   final ui.Image gradientMap;
   final BlurTransform transform;
+  final BlurColorAdjustment colorAdjustment;
   final Axis direction;
   final double sigma;
   final Widget child;
@@ -18,6 +20,7 @@ class InspireChildBlurImageFilterPass extends StatefulWidget {
     super.key,
     required this.gradientMap,
     required this.transform,
+    required this.colorAdjustment,
     required this.direction,
     required this.sigma,
     required this.child,
@@ -66,6 +69,7 @@ class _InspireChildBlurImageFilterPassState
       shader: shader,
       gradientMap: widget.gradientMap,
       transform: widget.transform,
+      colorAdjustment: widget.colorAdjustment,
       direction: widget.direction,
       sigma: widget.sigma,
       child: widget.child,
@@ -77,6 +81,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
   final ui.FragmentShader shader;
   final ui.Image gradientMap;
   final BlurTransform transform;
+  final BlurColorAdjustment colorAdjustment;
   final Axis direction;
   final double sigma;
 
@@ -85,6 +90,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
     required this.shader,
     required this.gradientMap,
     required this.transform,
+    required this.colorAdjustment,
     required this.direction,
     required this.sigma,
   });
@@ -98,6 +104,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
       shader,
       gradientMap,
       transform,
+      colorAdjustment,
       direction,
       sigma,
       scrollPosition,
@@ -118,6 +125,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
       ..shader = shader
       ..gradientMap = gradientMap
       ..transform = transform
+      ..colorAdjustment = colorAdjustment
       ..direction = direction
       ..sigma = sigma
       ..scrollPosition = scrollPosition
@@ -153,6 +161,13 @@ class _BlurFilterRenderObject extends RenderProxyBox {
   set transform(BlurTransform value) {
     if (_transform == value) return;
     _transform = value;
+    _updateShader();
+  }
+
+  BlurColorAdjustment _colorAdjustment;
+  set colorAdjustment(BlurColorAdjustment value) {
+    if (_colorAdjustment == value) return;
+    _colorAdjustment = value;
     _updateShader();
   }
 
@@ -196,6 +211,7 @@ class _BlurFilterRenderObject extends RenderProxyBox {
     this._shader,
     this._gradientMap,
     this._transform,
+    this._colorAdjustment,
     this._direction,
     this._sigma,
     this._scrollPosition,
@@ -272,9 +288,16 @@ class _BlurFilterRenderObject extends RenderProxyBox {
     _shader.setFloat(11, _transform.offset.dx);
     _shader.setFloat(12, _transform.offset.dy);
     _shader.setFloat(13, _transform.rotation);
-    _shader.setFloat(14, _transform.inversionFactor);
-    _shader.setFloat(15, normalizedOrigin.dx);
-    _shader.setFloat(16, normalizedOrigin.dy);
+    _shader.setFloat(14, normalizedOrigin.dx);
+    _shader.setFloat(15, normalizedOrigin.dy);
+    _shader.setFloat(16, _transform.inversionFactor);
+    _shader.setFloat(17, _colorAdjustment.shaderBrightness);
+    _shader.setFloat(18, _colorAdjustment.shaderContrast);
+    _shader.setFloat(19, _colorAdjustment.shaderExposure);
+    _shader.setFloat(20, _colorAdjustment.shaderSaturation);
+    _shader.setFloat(21, _colorAdjustment.shaderVibrance);
+    _shader.setFloat(22, _colorAdjustment.blurAdjustmentStrength);
+    _shader.setFloat(23, _colorAdjustment.nonBlurAdjustmentStrength);
 
     _recreateImageFilter();
     markNeedsPaint();

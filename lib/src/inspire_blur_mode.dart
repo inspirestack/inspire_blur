@@ -3,17 +3,19 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_shaders/flutter_shaders.dart';
 
-/// Defines mechanism which Inspire Blur uses for rendering.
+/// Defines mechanism used for rendering child blur.
 ///
 /// Different modes offer different trade-offs affecting performance,
 /// visual stability and compatibility in different use cases.
 ///
-/// **Quick guide:**
-/// - Use [auto] for most cases.
-/// - Use [imageFilter] for static, complex UI.
-/// - Use [animatedSampler] for stability in scrollable or transformed layouts.
+/// ### Quick guide
 ///
-/// **Performance:**
+/// * Use [auto] for most cases.
+/// * Use [imageFilter] for static, complex UI.
+/// * Use [animatedSampler] for stability in scrollable or transformed layouts.
+///
+/// ### Performance
+///
 /// Performance between [imageFilter] and [animatedSampler] might differ
 /// depending on the context where blur is used. One might be slightly faster
 /// than the other depending on specific use case. It is advised to measure
@@ -21,47 +23,50 @@ import 'package:flutter_shaders/flutter_shaders.dart';
 enum InspireBlurMode {
   /// Determines the best suitable mode in runtime.
   ///
-  /// The selection is based on rendering capabilities and layout context:
+  /// Resolves either to [imageFilter] or [animatedSampler].
   ///
-  /// - If Impeller engine is not available, it resolves to [animatedSampler].
-  /// - If the widget is used inside a scrollable container or is subject
-  ///   to complex transformations (e.g. scrolling, animations), it resolves
+  /// Mode selection is based on rendering capabilities and layout context:
+  ///
+  /// * If Impeller is unavailable, it resolves to [animatedSampler].
+  /// * If the widget is used inside a scrollable container or is subject
+  ///   to complex transformations, such as offset or scaling, it resolves
   ///   to [animatedSampler] for better stability.
-  /// - Otherwise, it prefers [imageFilter].
+  /// * Otherwise, it prefers [imageFilter].
   ///
   /// This is the recommended mode for most use cases.
   auto,
 
-  /// This mode integrates directly with Flutter's rendering pipeline
-  /// and is usually better for blurring complex widgets which are
-  /// deeply nested, or contain (not limited to):
-  /// - [Stack]
-  /// - [BoxShadow]
-  /// - [Opacity]
+  /// This mode integrates directly with Flutter's rendering pipeline.
   ///
-  /// This mode internally uses [ImageFilter.shader].
-  /// It is available on _Impeller_ engine only.
+  /// It is usually better for blurring complex widget trees which are
+  /// deeply nested, or contain (not limited to):
+  /// * [Stack]
+  /// * [BoxShadow]
+  /// * [Opacity]
+  ///
+  /// This mode internally uses [ImageFilter.shader]. It is only available on
+  /// Impeller.
   ///
   /// **Pros:**
-  /// - High visual fidelity due to tight GPU integration
+  /// * High visual fidelity due to tight GPU integration
   ///   (especially noticeable with low sigma values).
-  /// - Superior color precision and smooth gradients (Linear Color Space).
-  /// - No intermediate texture capture.
-  /// - Works well for static or mostly stationary widgets.
-  /// - Handles complex widget trees reliably without producing artifacts.
+  /// * Superior color precision and smooth gradients (Linear Color Space).
+  /// * No intermediate texture capture.
+  /// * Works well for static or mostly stationary widgets.
+  /// * Handles complex widget trees reliably without producing artifacts.
   ///
   /// **Cons:**
-  /// - May produce visual artifacts when the widget moves off-screen
+  /// * May produce visual artifacts when the widget moves partially off-screen
   ///   (e.g. inside scrollable containers).
-  /// - Flutter may translate cached layers instead of repainting them,
+  /// * Flutter may translate cached layers instead of repainting them,
   ///   which can lead to subtle inconsistencies in shader-based effects.
-  /// - Coordinate Mismatch: `FlutterFragCoord` may become desynced during
+  /// * Coordinate Mismatch: `FlutterFragCoord` may become desynced during
   ///   Layer Translations (e.g., when a parent translates without repainting).
-  /// - Clipping: May exhibit "hard edges" or sampling artifacts near the
+  /// * Clipping: May exhibit "hard edges" or sampling artifacts near the
   ///   boundaries of a [ClipRect].
   ///
   /// Use this mode for complex widgets which are mostly stationary, or for
-  /// blurring platform views.
+  /// blurring complex view hierarchies.
   imageFilter,
 
   /// This mode captures the widget into an offscreen texture and applies
@@ -70,16 +75,17 @@ enum InspireBlurMode {
   /// This mode internally uses [AnimatedSampler].
   ///
   /// **Pros:**
-  /// - Visually stable when the widget is moving off-screen (e.g. scrolling) —
-  ///   produces consistent results regardless of viewport position.
-  /// - Not affected by Flutter's layer translation or partial clipping.
-  /// - Works even when Impeller is not available.
+  /// * Visually stable when the widget is partially moving off-screen
+  ///   (e.g. scrolling) — produces consistent results regardless of
+  ///   the widget position on screen.
+  /// * Not affected by Flutter's layer translation or partial clipping.
+  /// * Works even when Impeller is not available, e.g. on the web.
   ///
   /// **Cons:**
-  /// - Potentially lower performance due to texture capture.
-  /// - May be less efficient for large or frequently updating widgets.
-  /// - Cannot capture platform views (e.g. WebView, Google Maps, some ads).
-  /// - Breaks tight integration with Flutter's GPU rendering pipeline,
+  /// * Potentially lower performance due to texture capture.
+  /// * May be less efficient for large or frequently updating widgets.
+  /// * Cannot capture platform views (e.g. WebView, Google Maps, some ads).
+  /// * Breaks tight integration with Flutter's GPU rendering pipeline,
   ///   as the widget is first rasterized into a texture and then processed
   ///   by the shader. This may introduce additional overhead and reduce
   ///   rendering fidelity compared to [imageFilter] in some scenarios.

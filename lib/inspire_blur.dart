@@ -2,14 +2,16 @@
 /// effects for Flutter.
 ///
 /// The package includes:
-/// - child blur and backdrop blur widgets
-/// - directional and shape-based blur distributions
-/// - tint effects
-/// - GPU shader-powered rendering optimized for Impeller
+/// * Child blur and backdrop blur widgets
+/// * Directional and shape-based blur distributions
+/// * Tint effects
+/// * GPU shader-powered rendering optimized for Impeller
 ///
 /// Designed for building modern, visually rich Flutter interfaces.
 library;
 
+export 'src/color_adjustment/blur_color_adjustment.dart'
+    show BlurColorAdjustment;
 export 'src/distribution/blur_distribution.dart';
 export 'src/inspire_backdrop_blur.dart' show InspireBackdropBlur;
 export 'src/inspire_blur.dart' show Inspire;

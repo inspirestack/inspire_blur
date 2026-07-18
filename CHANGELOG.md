@@ -1,3 +1,17 @@
+## 0.4.0
+
+### Added
+
+- **Color adjustments**
+  - Added blur area color adjustments: brightness, contrast, exposure, saturation, and vibrance via the new `BlurColorAdjustment` configuration class.
+  - Adjustments can be controlled by the `InspireBlurConfig.colorAdjustment` property.
+  - Full support implemented for both child and backdrop blur effects.
+
+### Changed
+
+- **Data classes:** Added `lerp()` and other utility methods to configuration data classes to support seamless UI transitions and implicit animations.
+- **Documentation:** Optimized docs using templates, improved API wording.
+
 ## 0.3.1
 
 ### Fixed

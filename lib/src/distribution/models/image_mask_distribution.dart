@@ -11,13 +11,15 @@ class ImageMaskDistribution extends BlurDistribution {
   /// whereas other channels, including alpha, are ignored.
   /// Using a fully opaque, grayscale image is thus recommended.
   ///
-  /// The image is sampled in UV space, i.e. it is normalized to (0,0)-(1,1)
-  /// space. Each point of the blur area is transformed to uv coordinates,
+  /// The image is sampled in UV space, i.e. normalized to 2D space of
+  /// `(0.0, 0.0) - (1.0, 1.0)`.
+  ///
+  /// Each point of the blur area is transformed to uv coordinates,
   /// and corresponding uv coordinate is used to sample the intensity from
   /// the image.
   final ui.Image maskImage;
 
-  /// Creates an image mask blur distribution configuration.
+  /// Creates a blur distribution with an image mask.
   ///
   /// The blur intensity is distributed according to the intensity
   /// of the pixels of the [maskImage].
@@ -28,14 +30,12 @@ class ImageMaskDistribution extends BlurDistribution {
   /// disposing it after it is no longer used by the blur effect.
   ImageMaskDistribution({required this.maskImage});
 
-  /// Returns a copy of this distribution with the provided properties updated.
+  /// Returns a copy of this distribution with the new image.
   ///
   /// Any parameter left `null` retains its current value.
   @override
   ImageMaskDistribution copyWith({ui.Image? maskImage}) {
-    final newMaskImage = maskImage ?? this.maskImage;
-
-    return ImageMaskDistribution(maskImage: newMaskImage);
+    return ImageMaskDistribution(maskImage: maskImage ?? this.maskImage);
   }
 
   @override
@@ -49,7 +49,5 @@ class ImageMaskDistribution extends BlurDistribution {
   int get hashCode => maskImage.hashCode;
 
   @override
-  String toString() => 'ImageMaskDistribution('
-      'maskImage: $maskImage'
-      ')';
+  String toString() => 'ImageMaskDistribution(maskImage: $maskImage)';
 }

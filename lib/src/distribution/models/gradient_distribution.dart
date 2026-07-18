@@ -6,14 +6,14 @@ part of 'package:inspire_blur/src/distribution/blur_distribution.dart';
 /// by starting and ending point (however the subclass defines it), as well as
 /// [values] and [stops] which define the blur strength progression.
 sealed class GradientDistribution extends BlurDistribution {
-  /// The blur intensity at each stop, from 0.0 to 1.0.
+  /// The blur intensity at each corresponding stop.
   ///
   /// Each value defines the fraction of the maximum blur strength
   /// (defined by `sigma`) applied at the corresponding control point
   /// from [stops].
   ///
-  /// * 0.0: Effective sigma is zero, which results in no blur effect.
-  /// * 1.0: Sigma reaches maximum, which produces full blur strength.
+  /// * `0.0`: Effective sigma is zero, which results in no blur effect.
+  /// * `1.0`: Sigma reaches maximum, which produces full blur strength.
   ///
   /// The values must be in the range `[0.0, 1.0]`.
   ///

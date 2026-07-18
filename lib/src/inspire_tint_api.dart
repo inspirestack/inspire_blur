@@ -3,7 +3,7 @@ import 'package:inspire_blur/src/inspire_tint.dart';
 
 /// API for the Inspire color tint widgets.
 ///
-/// Contains convenience factories that cover all typical tint directions
+/// Contains convenience factories that cover all typical tint directions,
 /// as well as the custom [directional] tint builder.
 class InspireTintApi {
   /// Creates an instance of Inspire Tint API.

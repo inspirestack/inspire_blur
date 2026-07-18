@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_shaders/flutter_shaders.dart';
+import 'package:inspire_blur/src/color_adjustment/blur_color_adjustment.dart';
 import 'package:inspire_blur/src/inspire_shaders.dart';
 import 'package:inspire_blur/src/transform/blur_transform.dart';
 import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.dart';
@@ -9,6 +10,7 @@ import 'package:inspire_blur/src/utils/extensions/inspire_geometry_extensions.da
 class InspireChildBlurAnimatedSamplerPass extends StatefulWidget {
   final ui.Image gradientMap;
   final BlurTransform transform;
+  final BlurColorAdjustment colorAdjustment;
   final Axis direction;
   final double sigma;
   final Widget child;
@@ -17,6 +19,7 @@ class InspireChildBlurAnimatedSamplerPass extends StatefulWidget {
     super.key,
     required this.gradientMap,
     required this.transform,
+    required this.colorAdjustment,
     required this.direction,
     required this.sigma,
     required this.child,
@@ -84,9 +87,16 @@ class _InspireChildBlurAnimatedSamplerPassState
           ..setFloat(11, widget.transform.offset.dx)
           ..setFloat(12, widget.transform.offset.dy)
           ..setFloat(13, widget.transform.rotation)
-          ..setFloat(14, widget.transform.inversionFactor)
-          ..setFloat(15, normalizedOrigin.dx)
-          ..setFloat(16, normalizedOrigin.dy);
+          ..setFloat(14, normalizedOrigin.dx)
+          ..setFloat(15, normalizedOrigin.dy)
+          ..setFloat(16, widget.transform.inversionFactor)
+          ..setFloat(17, widget.colorAdjustment.shaderBrightness)
+          ..setFloat(18, widget.colorAdjustment.shaderContrast)
+          ..setFloat(19, widget.colorAdjustment.shaderExposure)
+          ..setFloat(20, widget.colorAdjustment.shaderSaturation)
+          ..setFloat(21, widget.colorAdjustment.shaderVibrance)
+          ..setFloat(22, widget.colorAdjustment.blurAdjustmentStrength)
+          ..setFloat(23, widget.colorAdjustment.nonBlurAdjustmentStrength);
         final paint = Paint()..shader = shader;
         canvas.drawRect(Offset.zero & size, paint);
       },

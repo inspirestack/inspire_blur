@@ -22,8 +22,8 @@ class InspireShaders {
       );
 
   /// Tries to load asset from two different paths during:
-  ///  - normal package use,
-  ///  - running tests inside this package.
+  /// * Normal package use.
+  /// * Running tests inside this package.
   static Future<FragmentProgram?> _loadShader(String path) async {
     return await _tryLoad('packages/$_pkgName/$path') ?? await _tryLoad(path);
   }

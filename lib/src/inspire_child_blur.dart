@@ -15,7 +15,7 @@ import 'package:inspire_blur/src/utils/inspire_mode_resolver.dart';
 /// and does not sample or modify the background.
 ///
 /// The blur is applied directly to the rendered output of [child],
-/// making it suitable for blurring specific UI elements without
+/// making it suitable for blurring individual UI elements without
 /// affecting the surrounding scene (e.g. cards or images).
 class InspireChildBlur extends StatelessWidget {
   /// Configuration of the child blur.
@@ -33,7 +33,7 @@ class InspireChildBlur extends StatelessWidget {
   /// Disabling clipping allows the blur to extend beyond widget bounds.
   final Clip clipBehavior;
 
-  /// Whether to isolate the widget into a [RepaintBoundary].
+  /// Defines whether to isolate the widget into a [RepaintBoundary].
   ///
   /// Can improve rendering performance and stability.
   ///
@@ -98,8 +98,8 @@ class InspireChildBlur extends StatelessWidget {
 
         if (sigmaHorizontal != null &&
             sigmaVertical != null &&
-            sigmaHorizontal > 0 &&
-            sigmaVertical > 0) {
+            sigmaHorizontal > 0.0 &&
+            sigmaVertical > 0.0) {
           return _wrapWithClipRect(
             child: _maybeWrapWithRepaintBoundary(
               child: _buildBlurPass(
@@ -108,12 +108,14 @@ class InspireChildBlur extends StatelessWidget {
                 gradientMap: gradientMap,
                 direction: Axis.horizontal,
                 sigma: sigmaHorizontal,
+                applyColorAdjustment: true,
                 child: _buildBlurPass(
                   context: context,
                   resolvedMode: resolvedMode,
                   gradientMap: gradientMap,
                   direction: Axis.vertical,
                   sigma: sigmaVertical,
+                  applyColorAdjustment: false,
                   child: child,
                 ),
               ),
@@ -121,7 +123,7 @@ class InspireChildBlur extends StatelessWidget {
           );
         }
 
-        if (sigmaHorizontal != null && sigmaHorizontal > 0) {
+        if (sigmaHorizontal != null && sigmaHorizontal > 0.0) {
           return _wrapWithClipRect(
             child: _maybeWrapWithRepaintBoundary(
               child: _buildBlurPass(
@@ -130,13 +132,18 @@ class InspireChildBlur extends StatelessWidget {
                 gradientMap: gradientMap,
                 direction: Axis.horizontal,
                 sigma: sigmaHorizontal,
+                applyColorAdjustment: true,
                 child: child,
               ),
             ),
           );
         }
 
-        if (sigmaVertical != null && sigmaVertical > 0) {
+        if (sigmaVertical != null && sigmaVertical > 0.0 ||
+
+            // Allow to render the effect if there's no blur, but there's
+            // an active color adjustment.
+            config.colorAdjustment.isActive) {
           return _wrapWithClipRect(
             child: _maybeWrapWithRepaintBoundary(
               child: _buildBlurPass(
@@ -144,7 +151,8 @@ class InspireChildBlur extends StatelessWidget {
                 resolvedMode: resolvedMode,
                 gradientMap: gradientMap,
                 direction: Axis.vertical,
-                sigma: sigmaVertical,
+                sigma: sigmaVertical ?? 0.0,
+                applyColorAdjustment: true,
                 child: child,
               ),
             ),
@@ -174,12 +182,20 @@ class InspireChildBlur extends StatelessWidget {
     required ui.Image gradientMap,
     required Axis direction,
     required double sigma,
+    required bool applyColorAdjustment,
     required Widget child,
   }) {
+    // Use color adjustment only during the final pass to prevent applying
+    // it twice when 2-pass blur is rendered.
+    final currentPassColorAdjustment = applyColorAdjustment
+        ? config.colorAdjustment
+        : config.colorAdjustment.disabled();
+
     return switch (resolvedMode) {
       InspireBlurResolvedMode.imageFilter => InspireChildBlurImageFilterPass(
           gradientMap: gradientMap,
           transform: config.transform,
+          colorAdjustment: currentPassColorAdjustment,
           direction: direction,
           sigma: sigma,
           child: child,
@@ -188,6 +204,7 @@ class InspireChildBlur extends StatelessWidget {
         InspireChildBlurAnimatedSamplerPass(
           gradientMap: gradientMap,
           transform: config.transform,
+          colorAdjustment: currentPassColorAdjustment,
           direction: direction,
           sigma: sigma,
           child: child,

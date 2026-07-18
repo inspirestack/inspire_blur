@@ -21,7 +21,7 @@ class EllipseDistribution extends GradientDistribution {
   /// Center of the ellipse blur shape.
   final Alignment center;
 
-  /// Creates an ellipse blur distribution configuration.
+  /// Creates an elliptical blur distribution.
   ///
   /// The blur intensity is distributed according to the gradient defined by
   /// [radiusX], [radiusY], [center], [values], and [stops].
@@ -51,18 +51,33 @@ class EllipseDistribution extends GradientDistribution {
     List<double>? values,
     List<double>? stops,
   }) {
-    final newRadiusX = radiusX ?? this.radiusX;
-    final newRadiusY = radiusY ?? this.radiusY;
-    final newCenter = center ?? this.center;
-    final newValues = values ?? this.values;
-    final newStops = stops ?? this.stops;
+    return EllipseDistribution(
+      radiusX: radiusX ?? this.radiusX,
+      radiusY: radiusY ?? this.radiusY,
+      center: center ?? this.center,
+      values: values ?? this.values,
+      stops: stops ?? this.stops,
+    );
+  }
+
+  /// Linearly interpolates between two [EllipseDistribution] objects.
+  ///
+  /// Enables seamless transitions inside implicit animations or tweens.
+  static EllipseDistribution? lerp(
+    EllipseDistribution? a,
+    EllipseDistribution? b,
+    double t,
+  ) {
+    if (identical(a, b)) return a;
+    if (a == null) return b;
+    if (b == null) return a;
 
     return EllipseDistribution(
-      radiusX: newRadiusX,
-      radiusY: newRadiusY,
-      center: newCenter,
-      values: newValues,
-      stops: newStops,
+      radiusX: lerpDouble(a.radiusX, b.radiusX, t)!,
+      radiusY: lerpDouble(a.radiusY, b.radiusY, t)!,
+      center: Alignment.lerp(a.center, b.center, t)!,
+      values: lerpDoubleList(a.values, b.values, t),
+      stops: lerpDoubleList(a.stops, b.stops, t),
     );
   }
 

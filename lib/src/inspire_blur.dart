@@ -23,12 +23,12 @@ class Inspire {
   /// Consider using this if you want to ensure perfectly smooth first-time
   /// rendering (e.g. for animations or transitions).
   ///
-  /// If used, call this early in your app lifecycle, for example:
-  /// - in `main()` before `runApp()`
-  /// - during a splash screen or initial loading phase
+  /// If used, it is recommended to call this early in the app lifecycle.
+  /// For example:
+  /// - In `main()` before `runApp()`.
+  /// - During a splash screen or initial loading phase.
   ///
-  /// This is most useful when blur appears immediately on screen
-  /// or is used in animations and transitions.
+  /// This is most useful when blur effect appears immediately on screen.
   static Future<void> warmUp() async {
     try {
       await InspireShaders.backdropBlur;
@@ -38,12 +38,18 @@ class Inspire {
     }
   }
 
-  /// Blurs content behind this widget (scene-level blur).
+  /// Blurs content behind this widget.
+  ///
+  /// It is a scene-level blur, meaning that the blur effect is applied
+  /// to the scene rendered behind it.
   ///
   /// This is typically used for overlays, glass effects, or backgrounds.
   ///
-  /// Similar to [BackdropFilter], the [child] is drawn on top of
-  /// the blurred background.
+  /// Similarly to [BackdropFilter], the [child] is drawn on top of the
+  /// blurred background.
+  ///
+  /// By default, it blocks gestures from propagating to widgets below it.
+  /// To allow gestures to pass-through it, wrap it in [IgnorePointer].
   static Widget backdropBlur({
     required InspireBlurConfig config,
     Clip clipBehavior = Clip.antiAlias,
@@ -60,10 +66,13 @@ class Inspire {
     );
   }
 
-  /// Blurs only the given [child] (widget-level blur).
+  /// Blurs only the given [child].
   ///
-  /// This is useful for blurring specific UI elements such as cards,
-  /// images, or components without affecting the background.
+  /// It is a component-level blur, meaning that the blur effect is applied
+  /// to the widget inside it.
+  ///
+  /// This is useful for blurring individual UI elements, such as cards,
+  /// images, or components, without affecting the background.
   static Widget childBlur({
     required InspireBlurConfig config,
     required Widget child,

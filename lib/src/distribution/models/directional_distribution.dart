@@ -37,16 +37,31 @@ final class DirectionalDistribution extends GradientDistribution {
     List<double>? values,
     List<double>? stops,
   }) {
-    final newBegin = begin ?? this.begin;
-    final newEnd = end ?? this.end;
-    final newValues = values ?? this.values;
-    final newStops = stops ?? this.stops;
+    return DirectionalDistribution(
+      begin: begin ?? this.begin,
+      end: end ?? this.end,
+      values: values ?? this.values,
+      stops: stops ?? this.stops,
+    );
+  }
+
+  /// Linearly interpolates between two [DirectionalDistribution] objects.
+  ///
+  /// Enables seamless transitions inside implicit animations or tweens.
+  static DirectionalDistribution? lerp(
+    DirectionalDistribution? a,
+    DirectionalDistribution? b,
+    double t,
+  ) {
+    if (identical(a, b)) return a;
+    if (a == null) return b;
+    if (b == null) return a;
 
     return DirectionalDistribution(
-      begin: newBegin,
-      end: newEnd,
-      values: newValues,
-      stops: newStops,
+      begin: Alignment.lerp(a.begin, b.begin, t)!,
+      end: Alignment.lerp(a.end, b.end, t)!,
+      values: lerpDoubleList(a.values, b.values, t),
+      stops: lerpDoubleList(a.stops, b.stops, t),
     );
   }
 

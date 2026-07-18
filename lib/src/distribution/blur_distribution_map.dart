@@ -82,6 +82,8 @@ abstract class IntensityBasedDistributionMap extends BlurDistributionMap {
 }
 
 extension BlurDistributionExtension on BlurDistribution {
+  /// Creates a corresponding blur distribution map generator
+  /// for the given blur distribution type.
   BlurDistributionMap toDistributionMap({required int size}) => switch (this) {
         UniformDistribution _ => UniformDistributionMap(
             width: size,

@@ -45,59 +45,52 @@ Inspire Blur is designed to handle many of the common challenges of applying var
   </table>
 </div>
 
-Run the example app to see interactive demos, including both backdrop and child blur in real-world scenarios.
+Run the [example app](https://pub.dev/packages/inspire_blur/example) to see interactive demos, including both backdrop and child blur in real-world scenarios.
+
+## Why Inspire Blur?
+
+Flutter currently does not provide a built-in blur widget with variable strength.
+
+Inspire Blur uses custom GPU shaders to create blur effects of varying strength. This approach makes it more powerful and customizable than solutions that simply apply a `ShaderMask` to a uniform blur.
 
 ## Features
 
 - Gradient-based smoothly fading blur
 - Scene-level and component-level blur modes
 - GPU-accelerated custom shader implementation
-- Optimized for Impeller — with automatic fallback
-- Presets for common variable blur shapes
-- Flexible configuration for advanced use cases
-- Handling for complex UI layering setups (Stacks, Gradients, Shadows, Overlays, etc.)
-
-## Why another blur package?
-
-Flutter currently does not provide a built-in blur widget with variable strength.
-
-**Inspire Blur provides:**
-
-- Progressive/variable blur
-- Any custom shape masked blur
-- Child and backdrop blur widgets
+- Presets for common blur fades and shapes
+- Fully custom blur distributions using image masks
+- Flexible, yet simple configuration
+- Built-in handling for complex UI layering setups (Stacks, Gradients, Shadows, Overlays, etc.)
 - Dynamic blur that works well with animations
-- GPU shaders optimized for Impeller
-- Automatic fallback for compatibility
+- Optimized for Impeller — with automatic fallback
 
 ## Blur Widgets
 
-Inspire Blur has two distinct blur widgets:
+Inspire Blur has two blur widgets:
 
-- **Backdrop blur widget** — a widget that blurs the content _behind_ it.
-- **Child blur widget** — a widget that blurs the content _inside_ it.
+- **Backdrop blur** — a widget that blurs the content _behind_ it.
+- **Child blur** — a widget that blurs the content _inside_ it.
 
 ### Backdrop Blur
 
-Best suited for large, dynamic areas, such as screens, scaffolds, lists, grids, or carousels. It blurs any content rendered behind it, making it ideal for broad scene-level effects.
+Best for large, dynamic areas, such as screens, scaffolds, lists, grids, or carousels. It blurs any content rendered behind it, making it ideal for broad scene-level effects.
 
-#### Common Examples
+#### Examples
 
 - **iOS-like system bars** — recreate the iOS blur effect beneath the status and navigation bars.
-- **Top screen edge blur** — gradually blur the content beneath the status bar.
-- **Bottom screen edge blur** — gradually blur the content beneath the navigation bar.
 
 ### Child Blur
 
 Ideal for standalone UI elements like cards, images, or small components. It works by wrapping the widget that should be blurred.
 
-#### Common Examples
+#### Examples
 
 - **Card with a background image and text on top** — blur effect with a gradually fading intensity that makes the text and icons stand out more on top of the background.
 
 ### Choosing Blur Mode
 
-Both blur modes can produce similar visual effects, but they are designed for different scenarios. Choosing the appropriate mode helps ensure the best stability and performance.
+Both blur modes can produce similar visual effects, but they are designed for different scenarios. Choosing the appropriate mode helps ensure the best compatibility.
 
 | Blur mode     | Typical use case                                                    |
 | ------------- | ------------------------------------------------------------------- |
@@ -429,11 +422,13 @@ Blur strength is perceived differently depending on the screen resolution. On sm
 
 ## Support the Project
 
-If Inspire Blur helped you build a beautiful UI for your app, consider giving it a 👍 on [pub.dev](https://pub.dev/packages/inspire_blur) and a ⭐️ on [GitHub](https://github.com/inspirestack/inspire_blur). It helps other developers discover the project.
+If Inspire Blur helped you build a beautiful UI for your app, consider giving it a 👍 on [pub.dev](https://pub.dev/packages/inspire_blur) and a ⭐️ on [GitHub](https://github.com/inspirestack/inspire_blur). It helps other Flutter developers discover the project and supports its growth.
 
 ### Package Funding
 
-If you'd like to support the ongoing development of Inspire Blur, you can also [buy InspireStack a cup of coffee ☕️](https://buymeacoffee.com/inspirestack).
+If Inspire Blur has been useful in your project and you'd like to say thanks, you can support its continued development on [buymeacoffee.com ☕️](https://buymeacoffee.com/inspirestack).
+
+Your support helps keep new features, improvements, and future packages coming.
 
 ### Share What You’ve Built!
 

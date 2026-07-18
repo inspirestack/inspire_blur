@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inspire_blur/src/distribution/blur_distribution.dart';
 import 'package:inspire_blur/src/inspire_blur_config.dart';
-import 'package:inspire_blur/src/transform/blur_transform.dart';
 
 import 'test_core.dart';
 
@@ -15,7 +14,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       );
 
   test('Constructor accepts valid configs', () {
@@ -27,7 +25,6 @@ void main() {
         stops: [0, 1],
         values: [0, 1],
       ),
-      transform: BlurTransform.identity,
     );
 
     final configWithSigmaX = InspireBlurConfig(
@@ -38,7 +35,6 @@ void main() {
         stops: [0, 1],
         values: [0, 1],
       ),
-      transform: BlurTransform.identity,
     );
 
     final configWithSigmaY = InspireBlurConfig(
@@ -49,7 +45,6 @@ void main() {
         stops: [0, 1],
         values: [0, 1],
       ),
-      transform: BlurTransform.identity,
     );
 
     final configWithSigmaXY = InspireBlurConfig(
@@ -61,7 +56,6 @@ void main() {
         stops: [0, 1],
         values: [0, 1],
       ),
-      transform: BlurTransform.identity,
     );
 
     expect(configWithSigma.sigma, equals(1));
@@ -94,7 +88,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ),
       throwsAssertionError,
     );
@@ -112,7 +105,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ),
       throwsAssertionError,
     );
@@ -128,7 +120,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(
         sigmaX: 5,
         sigmaY: 5,
@@ -148,7 +139,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ),
       throwsAssertionError,
     );
@@ -164,7 +154,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(sigmaX: 5),
       throwsAssertionError,
     );
@@ -181,7 +170,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ),
       throwsAssertionError,
     );
@@ -197,7 +185,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(sigmaY: 5),
       throwsAssertionError,
     );
@@ -292,7 +279,6 @@ void main() {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
-      transform: BlurTransform.identity,
     );
     final copiedConfig = config.copyWith();
 
@@ -310,7 +296,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(sigmaX: 5),
       throwsAssertionError,
     );
@@ -323,7 +308,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(sigmaY: 5),
       throwsAssertionError,
     );
@@ -336,7 +320,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(sigma: 5),
       throwsAssertionError,
     );
@@ -349,7 +332,6 @@ void main() {
           stops: [0, 1],
           values: [0, 1],
         ),
-        transform: BlurTransform.identity,
       ).copyWith(sigma: 5),
       throwsAssertionError,
     );

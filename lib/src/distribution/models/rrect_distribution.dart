@@ -9,14 +9,14 @@ final class RRectDistribution extends GradientDistribution {
   /// of the blur region.
   ///
   /// Normalized to the range `[0.0, 0.5)`. Values greater than or equal
-  /// to `0.5` will collapse the area.
+  /// to `0.5` will collapse the blur area.
   final double horizontalInset;
 
   /// The normalized distance from the top and bottom edges to the start
   /// of the blur region.
   ///
   /// Normalized to the range `[0.0, 0.5)`. Values greater than or equal
-  /// to `0.5` will collapse the area.
+  /// to `0.5` will collapse the blur area.
   final double verticalInset;
 
   /// The normalized corner radius of the shape.
@@ -27,7 +27,7 @@ final class RRectDistribution extends GradientDistribution {
   /// maximum corner rounding for the given shape.
   final double cornerRadius;
 
-  /// Creates a rounded rectangle blur distribution configuration.
+  /// Creates a rounded-rectangular blur distribution.
   ///
   /// The blur intensity is distributed according to the gradient
   /// defined by [values], and [stops].
@@ -53,18 +53,33 @@ final class RRectDistribution extends GradientDistribution {
     List<double>? values,
     List<double>? stops,
   }) {
-    final newHorizontalInset = horizontalInset ?? this.horizontalInset;
-    final newVerticalInset = verticalInset ?? this.verticalInset;
-    final newCornerRadius = cornerRadius ?? this.cornerRadius;
-    final newValues = values ?? this.values;
-    final newStops = stops ?? this.stops;
+    return RRectDistribution(
+      horizontalInset: horizontalInset ?? this.horizontalInset,
+      verticalInset: verticalInset ?? this.verticalInset,
+      cornerRadius: cornerRadius ?? this.cornerRadius,
+      values: values ?? this.values,
+      stops: stops ?? this.stops,
+    );
+  }
+
+  /// Linearly interpolates between two [RRectDistribution] objects.
+  ///
+  /// Enables seamless transitions inside implicit animations or tweens.
+  static RRectDistribution? lerp(
+    RRectDistribution? a,
+    RRectDistribution? b,
+    double t,
+  ) {
+    if (identical(a, b)) return a;
+    if (a == null) return b;
+    if (b == null) return a;
 
     return RRectDistribution(
-      horizontalInset: newHorizontalInset,
-      verticalInset: newVerticalInset,
-      cornerRadius: newCornerRadius,
-      values: newValues,
-      stops: newStops,
+      horizontalInset: lerpDouble(a.horizontalInset, b.horizontalInset, t)!,
+      verticalInset: lerpDouble(a.verticalInset, b.verticalInset, t)!,
+      cornerRadius: lerpDouble(a.cornerRadius, b.cornerRadius, t)!,
+      values: lerpDoubleList(a.values, b.values, t),
+      stops: lerpDoubleList(a.stops, b.stops, t),
     );
   }
 

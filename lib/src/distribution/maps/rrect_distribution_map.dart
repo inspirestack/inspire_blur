@@ -1,4 +1,4 @@
-import 'dart:math' show max, sqrt, min;
+import 'dart:math';
 
 import 'package:inspire_blur/src/distribution/maps/gradient_distribution_map.dart';
 

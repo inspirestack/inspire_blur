@@ -166,25 +166,8 @@ void main() {
   vec2 areaTopLeftUV = u_area_origin / u_size;
   vec2 areaBottomRightUV = (u_area_origin + u_area_size) / u_size;
 
-#ifdef IMPELLER_TARGET_OPENGLES
-  // 1. Flip the sampling UV
-  uv.y = 1.0 - uv.y;
-
-  // 2. Flip and SWAP the bounds. 
-  // In GL, the 'Top' of the screen is Y=1.0, and 'Bottom' is Y=0.0.
-  float tempTop = 1.0 - areaBottomRightUV.y;
-  float tempBottom = 1.0 - areaTopLeftUV.y;
-  
-  areaTopLeftUV.y = tempTop;
-  areaBottomRightUV.y = tempBottom;
-#endif
-
   vec2 areaUV = (uv - areaTopLeftUV) / (areaBottomRightUV - areaTopLeftUV);
   areaUV = clamp(areaUV, vec2(0.0), vec2(1.0));
-
-#ifdef IMPELLER_TARGET_OPENGLES
-  areaUV.y = 1.0 - areaUV.y;
-#endif
 
   areaUV = transformUv(areaUV);
 

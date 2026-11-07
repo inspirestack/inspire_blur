@@ -264,7 +264,7 @@ class _InspireBackdropBlurPassState extends State<_InspireBackdropBlurPass> {
   }
 
   void _updateShader() {
-    final dpr = MediaQuery.of(context).devicePixelRatio;
+    final dpr = MediaQuery.devicePixelRatioOf(context);
 
     final normalizedOrigin = widget.transform.origin.toNormalizedOffset();
 

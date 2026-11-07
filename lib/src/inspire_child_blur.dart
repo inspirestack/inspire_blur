@@ -224,6 +224,7 @@ class InspireChildBlur extends StatelessWidget {
           aspectRatioCorrection: aspectRatioCorrection,
           direction: direction,
           sigma: sigma,
+          clipBehavior: clipBehavior,
           child: child,
         ),
       InspireBlurResolvedMode.animatedSampler =>

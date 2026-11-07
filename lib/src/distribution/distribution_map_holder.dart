@@ -21,7 +21,7 @@ class DistributionMapHolder {
     required BuildContext context,
     required Distribution? distribution,
   }) {
-    final newSize = MediaQuery.of(context).size.longestSide;
+    final newSize = MediaQuery.sizeOf(context).longestSide;
 
     if (!_hasScreenSize || newSize != _screenLongestSide) {
       _screenLongestSide = newSize;

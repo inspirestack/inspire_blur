@@ -74,7 +74,7 @@ class _InspireChildBlurAnimatedSamplerPassState
 
     return AnimatedSampler(
       (image, size, canvas) {
-        final dpr = MediaQuery.of(context).devicePixelRatio;
+        final dpr = MediaQuery.devicePixelRatioOf(context);
 
         final normalizedOrigin = widget.transform.origin.toNormalizedOffset();
 

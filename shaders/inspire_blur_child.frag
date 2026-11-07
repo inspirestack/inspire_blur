@@ -2,8 +2,19 @@
 #include <flutter/runtime_effect.glsl>
 
 // Maximum blur radius. Must be a compile-time constant to satisfy SkSL loop constraints.
-#define MAX_RADIUS 64
-#define MAX_RADIUS_F 64.0
+//
+// The radius is measured in texels, and the two child blur passes use
+// different texels: the animatedSampler pass samples a logical-pixel texture
+// (and divides sigma by the device pixel ratio), while the imageFilter pass
+// samples a device-pixel texture. With a limit of 64 the imageFilter pass hit
+// the limit at a sigma of ~21 device px (~7 logical px at 3x), where the
+// Gaussian kernel is cut off and renormalised and the blur turns visibly
+// boxy. 192 moves that cutoff to ~64 device px, where the animatedSampler
+// pass's cutoff used to be on a 3x screen (the animatedSampler cutoff moves
+// up as well). The loop exits at the actual radius, so sigmas below the old
+// limit cost the same; larger sigmas now cost more taps but blur correctly.
+#define MAX_RADIUS 192
+#define MAX_RADIUS_F 192.0
 
 // Minimum sigma below which blur is negligible and skipped.
 #define MIN_SIGMA 1.0e-2

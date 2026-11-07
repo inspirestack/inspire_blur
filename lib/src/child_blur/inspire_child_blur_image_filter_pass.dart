@@ -21,6 +21,10 @@ class InspireChildBlurImageFilterPass extends StatefulWidget {
   final AspectRatioCorrection aspectRatioCorrection;
   final Axis direction;
   final double sigma;
+
+  /// How the blurred child is clipped to this widget's bounds. Matches
+  /// [InspireChildBlur.clipBehavior]; [Clip.none] leaves the child unclipped.
+  final Clip clipBehavior;
   final Widget child;
 
   const InspireChildBlurImageFilterPass({
@@ -33,6 +37,7 @@ class InspireChildBlurImageFilterPass extends StatefulWidget {
     required this.aspectRatioCorrection,
     required this.direction,
     required this.sigma,
+    this.clipBehavior = Clip.hardEdge,
     required this.child,
   });
 
@@ -83,6 +88,7 @@ class _InspireChildBlurImageFilterPassState
       aspectRatioCorrection: widget.aspectRatioCorrection,
       direction: widget.direction,
       sigma: widget.sigma,
+      clipBehavior: widget.clipBehavior,
       child: widget.child,
     );
   }
@@ -98,6 +104,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
   final AspectRatioCorrection aspectRatioCorrection;
   final Axis direction;
   final double sigma;
+  final Clip clipBehavior;
 
   const _BlurFiltered({
     super.child,
@@ -110,6 +117,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
     required this.aspectRatioCorrection,
     required this.direction,
     required this.sigma,
+    required this.clipBehavior,
   });
 
   @override
@@ -127,6 +135,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
       aspectRatioCorrection,
       direction,
       sigma,
+      clipBehavior,
       scrollPosition,
       _getScreenSize(view),
       _getDpr(context),
@@ -151,6 +160,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
       ..aspectRatioCorrection = aspectRatioCorrection
       ..direction = direction
       ..sigma = sigma
+      ..clipBehavior = clipBehavior
       ..scrollPosition = scrollPosition
       ..screenSize = _getScreenSize(view)
       ..dpr = _getDpr(context);
@@ -229,6 +239,13 @@ class _BlurFilterRenderObject extends RenderProxyBox {
     _updateShader();
   }
 
+  Clip _clipBehavior;
+  set clipBehavior(Clip value) {
+    if (_clipBehavior == value) return;
+    _clipBehavior = value;
+    markNeedsPaint();
+  }
+
   Size _screenSize;
   set screenSize(Size value) {
     if (_screenSize == value) return;
@@ -261,12 +278,15 @@ class _BlurFilterRenderObject extends RenderProxyBox {
     this._aspectRatioCorrection,
     this._direction,
     this._sigma,
+    this._clipBehavior,
     this._scrollPosition,
     this._screenSize,
     this._dpr,
   ) {
     _updateShader();
   }
+
+  final LayerHandle<ClipRectLayer> _clipLayer = LayerHandle<ClipRectLayer>();
 
   Rect? _lastPaintedBounds;
   bool? _wasFullyVisible;
@@ -282,6 +302,12 @@ class _BlurFilterRenderObject extends RenderProxyBox {
   void attach(PipelineOwner owner) {
     super.attach(owner);
     _attachListener();
+  }
+
+  @override
+  void dispose() {
+    _clipLayer.layer = null;
+    super.dispose();
   }
 
   @override
@@ -399,7 +425,32 @@ class _BlurFilterRenderObject extends RenderProxyBox {
 
     context.pushLayer(filterLayer,
         (PaintingContext childContext, Offset childOffset) {
-      childContext.paintChild(childValue, childOffset);
+      // The shader receives the size of the filter's input texture as
+      // `u_size`, and `FlutterFragCoord()` is relative to that texture. The
+      // texture covers whatever the child subtree actually paints, so a
+      // descendant that paints outside this box (e.g. a background moved
+      // with `Transform.translate`) would stretch and shift the blur
+      // distribution. Clipping the child to this box prevents descendants
+      // from enlarging the texture past the widget's bounds, which the
+      // animatedSampler pass gets for free by drawing `Offset.zero & size`.
+      // `InspireChildBlur` clips the whole effect to the same box with the
+      // same [clipBehavior], so this clip does not change what is visible;
+      // with [Clip.none] the child is left unclipped, as before.
+      if (_clipBehavior == Clip.none) {
+        _clipLayer.layer = null;
+        childContext.paintChild(childValue, childOffset);
+        return;
+      }
+      _clipLayer.layer = childContext.pushClipRect(
+        needsCompositing,
+        childOffset,
+        Offset.zero & size,
+        (PaintingContext clipContext, Offset clipOffset) {
+          clipContext.paintChild(childValue, clipOffset);
+        },
+        clipBehavior: _clipBehavior,
+        oldLayer: _clipLayer.layer,
+      );
     }, offset);
   }
 }

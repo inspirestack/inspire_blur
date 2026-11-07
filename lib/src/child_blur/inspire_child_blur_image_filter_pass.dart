@@ -170,7 +170,7 @@ class _BlurFiltered extends SingleChildRenderObjectWidget {
       view.physicalSize / view.devicePixelRatio;
 
   double _getDpr(BuildContext context) =>
-      MediaQuery.of(context).devicePixelRatio;
+      MediaQuery.devicePixelRatioOf(context);
 }
 
 class _BlurFilterRenderObject extends RenderProxyBox {

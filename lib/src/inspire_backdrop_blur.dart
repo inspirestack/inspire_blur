@@ -244,16 +244,12 @@ class _InspireBackdropBlurPassState extends State<_InspireBackdropBlurPass> {
 
   void _loadShader() {
     InspireShaders.backdropBlur.then((program) {
-      final shader = program?.fragmentShader();
-      if (mounted) {
-        setState(() {
-          _shader = shader;
-          _updateShader();
-        });
-      } else {
-        _shader = shader;
+      if (!mounted) return;
+
+      setState(() {
+        _shader = program?.fragmentShader();
         _updateShader();
-      }
+      });
     });
   }
 
